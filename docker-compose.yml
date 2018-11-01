@@ -10,3 +10,10 @@ services:
             POSTGRES_USER: coffee
             POSTGRES_PASSWORD: qwerty123
             POSTGRES_DB: coffee
+
+    payments:
+        image: rodolpheche/wiremock
+        ports:
+            - '8080'
+        volumes:
+            - ./payments:/home/wiremock/mappings
