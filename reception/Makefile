@@ -6,13 +6,8 @@ WARN_COLOR=\033[33;01m
 .PHONY: all clean deps test build
 all: clean deps test build
 
-deps:
-	@echo "$(OK_COLOR)==> Installing dependencies$(NO_COLOR)"
-	@go get -u github.com/golang/dep/cmd/dep
-	@dep ensure --vendor-only
-
 # Builds the project
-build: 
+build:
 	@echo "$(OK_COLOR)==> Building... $(NO_COLOR)"
 	@CGO_ENABLED=0 go build -ldflags "-s -w" -ldflags "-X cmd.version=${VERSION}" -o "dist/coffee-shop" github.com/italolelis/coffee-shop
 
@@ -38,19 +33,13 @@ lint: tools.golint
 #-- tools
 #---------------
 
-.PHONY: tools tools.dep tools.golint
-tools: tools.dep tools.golint
+.PHONY: tools tools.golint tools.migrate
+tools: tools.golint tools.migrate
 
 tools.golint:
 	@command -v golint >/dev/null ; if [ $$? -ne 0 ]; then \
 		echo "--> installing golint"; \
 		go get github.com/golang/lint/golint; \
-	fi
-
-tools.dep:
-	@command -v dep >/dev/null ; if [ $$? -ne 0 ]; then \
-		echo "--> installing dep"; \
-		@go get -u github.com/golang/dep/cmd/dep; \
 	fi
 
 tools.migrate:

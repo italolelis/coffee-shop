@@ -8,9 +8,9 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/italolelis/coffee-shop/pkg/config"
-	"github.com/italolelis/coffee-shop/pkg/log"
-	"github.com/italolelis/coffee-shop/pkg/reception"
+	"github.com/italolelis/reception/pkg/config"
+	"github.com/italolelis/log"
+	"github.com/italolelis/reception/pkg/reception"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
