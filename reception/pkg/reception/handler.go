@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
-	"github.com/italolelis/coffee-shop/pkg/log"
+	"github.com/italolelis/kit/log"
 	"github.com/satori/go.uuid"
 )
 

@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/italolelis/reception/pkg/config"
-	"github.com/italolelis/log"
+	"github.com/italolelis/kit/log"
 	"github.com/italolelis/reception/pkg/reception"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
