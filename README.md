@@ -11,6 +11,12 @@ Reception is the service that is receiving new orders and sending to the `barist
 * We have a simple `orders` API where you can place your orders. An order is only placed after the payment is done successfuly.
 * To keep things simple, we mock the `payments` service with [wiremock](http://wiremock.org) in a separate container where we can simulate failure when necessary.
 
+You can easily create one order by using the following example:
+
+```sh
+http POST localhost:9010/orders < reception/fixtures/order.json
+```
+
 ## Barista
 
 Barista is the service that actually prepares your coffee and make sure you can have the best experience possible.
