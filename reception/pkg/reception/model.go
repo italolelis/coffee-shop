@@ -34,6 +34,7 @@ func NewOrder() *Order {
 	}
 }
 
+// Value return a driver.Value representation of the order items
 func (p Items) Value() (driver.Value, error) {
 	if len(p) == 0 {
 		return nil, nil
@@ -41,6 +42,7 @@ func (p Items) Value() (driver.Value, error) {
 	return json.Marshal(p)
 }
 
+// Scan scans a database json representation into a []Item
 func (p *Items) Scan(src interface{}) error {
 	v := reflect.ValueOf(src)
 	if !v.IsValid() || v.IsNil() {
