@@ -8,11 +8,19 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"github.com/italolelis/kit/log"
+	"github.com/italolelis/kit/proto/order"
 	"github.com/satori/go.uuid"
+	"github.com/rafaeljesus/rabbus"
+	"github.com/golang/protobuf/proto"
+)
+
+const (
+	exchangeName = "orders"
+	exchangeType = "topic"
 )
 
 // CreateOrderHandler is the hander for order creation
-func CreateOrderHandler(repo WriteRepository) http.HandlerFunc {
+func CreateOrderHandler(repo WriteRepository, eventStream *rabbus.Rabbus) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		logger := log.WithContext(ctx)
@@ -27,6 +35,18 @@ func CreateOrderHandler(repo WriteRepository) http.HandlerFunc {
 		logger.Debugw("creating order", "order_id", o.ID)
 		if err := repo.Add(ctx, o); err != nil {
 			http.Error(w, "could not save your order", http.StatusInternalServerError)
+			return
+		}
+
+		ev := order.Created{
+			ID: o.ID.String(),
+		}
+		for _, i := range o.Items {
+			ev.Items = append(ev.Items, i.Type)
+		}
+		
+		if err:= sendEvent(eventStream, "orders.created", &ev); err != nil {
+			http.Error(w, "could not send an event of your order", http.StatusInternalServerError)
 			return
 		}
 
@@ -62,4 +82,22 @@ func GetOrderHandler(repo ReadRepository) http.HandlerFunc {
 
 		render.JSON(w, r, data)
 	}
+}
+
+func sendEvent(r *rabbus.Rabbus, key string, payload proto.Message) error {
+	data, err := proto.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("failed to marshal the message before sending to the message stream: %s", err.Error())
+	}
+
+	msg := rabbus.Message{
+		Exchange: exchangeName,
+		Kind:    exchangeType,
+		Key:     key,
+		Payload:  data,
+	}
+
+	r.EmitAsync() <- msg
+
+	return nil
 }

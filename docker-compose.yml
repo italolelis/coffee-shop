@@ -1,15 +1,31 @@
 version: '3'
 services:
 
-    reception:
-        build: 
-            context: "./"
-            dockerfile: "./Dockerfile_reception"
+    # reception:
+    #     build: 
+    #         context: "./"
+    #         dockerfile: "./Dockerfile_reception"
+    #     ports:
+    #         - '9010:8080'
+    #     environment:
+    #         LOG_LEVEL: debug
+    #         DATABASE_DSN: postgres://coffee:qwerty123@reception_db/reception?sslmode=disable
+    #         EVENT_STREAM_DSN: amqp://rabbit/
+
+    # barista:
+    #     build: 
+    #         context: "./"
+    #         dockerfile: "./Dockerfile_barista"
+    #     environment:
+    #         LOG_LEVEL: debug
+    #         EVENT_STREAM_DSN: amqp://rabbit/
+
+    payments:
+        image: rodolpheche/wiremock
         ports:
-            - '9010:8080'
-        environment:
-            LOG_LEVEL: debug
-            DATABASE_DSN: postgres://coffee:qwerty123@reception_db/reception?sslmode=disable
+            - '8081'
+        volumes:
+            - ./payments:/home/wiremock/mappings
 
     reception_db:
         image: postgres:9.6
@@ -21,9 +37,8 @@ services:
             POSTGRES_PASSWORD: qwerty123
             POSTGRES_DB: reception
 
-    payments:
-        image: rodolpheche/wiremock
+    rabbit:
+        image: rabbitmq:3.6-management-alpine
         ports:
-            - '8080'
-        volumes:
-            - ./payments:/home/wiremock/mappings
+            - "5672:5672"
+            - "15672:15672"

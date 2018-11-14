@@ -2,18 +2,12 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"net/http"
-	"time"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
-	"github.com/italolelis/reception/pkg/config"
+	"github.com/italolelis/barista/pkg/config"
+	"github.com/golang/protobuf/proto"
+	"github.com/italolelis/kit/proto/order"
 	"github.com/italolelis/kit/log"
-	"github.com/italolelis/reception/pkg/reception"
-	"github.com/jmoiron/sqlx"
 	"github.com/rafaeljesus/rabbus"
-	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -33,7 +27,7 @@ func main() {
 	log.SetLevel(cfg.LogLevel)
 
 	// setup the event stream. In this case is an event broker because we chose rabbitmq
-	eventStream, err:=setupEventStream(ctx, cfg.EventStream)
+	eventStream, err := setupEventStream(ctx, cfg.EventStream)
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
@@ -43,42 +37,39 @@ func main() {
 		}
 	}(eventStream)
 
-	go func() {
-		for {
-			select {
-			case <-eventStream.EmitOk():
-				logger.Debug("message sent")
-			case <-eventStream.EmitErr():
-				logger.Debug("message was not sent")
-			}
-		}
-	}()
-
 	go eventStream.Run(ctx)
 
-	// connects to the primary datastore
-	db, err := sqlx.Connect("postgres", cfg.Database.DSN)
-	if err != nil {
-		logger.Fatal(err.Error())
-	}
-	defer db.Close()
-
-	wRepo := reception.NewPostgresWriteRepository(db)
-	rRepo := reception.NewPostgresReadRepository(db)
-
-	// creates the router and register the handlers
-	r := chi.NewRouter()
-	r.Use(middleware.RequestID)
-	r.Use(middleware.Logger)
-	r.Use(middleware.Timeout(60 * time.Second))
-
-	r.Route("/orders", func(r chi.Router) {
-		r.Post("/", reception.CreateOrderHandler(wRepo, eventStream))
-		r.Get("/{id}", reception.GetOrderHandler(rRepo))
+	messages, err := eventStream.Listen(rabbus.ListenConfig{
+		Exchange: "orders",
+		Kind:     "topic",
+		Key:      "orders.created",
+		Queue:    "orders_barista",
 	})
+	if err != nil {
+		logger.Fatalw("failed to create listener", "err", err.Error())
+		return
+	}
+	defer close(messages)
 
-	logger.Infow("service running", "port", cfg.Port)
-	logger.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), chi.ServerBaseContext(ctx, r)))
+	logger.Info("listening for messages...")
+	for {
+		m, ok := <-messages
+		if !ok {
+			logger.Info("stop listening messages!")
+			break
+		}
+
+		o := order.Created{}
+		err = proto.Unmarshal(m.Body, &o)
+		if err != nil {
+			logger.Errorw("unmarshaling error", "err", err)
+		}
+
+		logger.Infow("your order is ready", "order_id", o.ID)
+		m.Ack(false)
+
+		logger.Info("message was consumed")
+	}
 }
 
 func setupEventStream(ctx context.Context, cfg config.EventStream) (*rabbus.Rabbus, error) {

@@ -8,15 +8,8 @@ import (
 
 // Config is the application configuration
 type Config struct {
-	Port        int    `default:"8080"`
 	LogLevel    string `envconfig:"LOG_LEVEL"`
-	Database    Database
 	EventStream EventStream
-}
-
-// Database holds the database configurations
-type Database struct {
-	DSN string `envconfig:"DATABASE_DSN"`
 }
 
 // EventStream holds the event stream configurations

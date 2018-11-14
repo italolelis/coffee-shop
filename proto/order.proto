@@ -1,0 +1,11 @@
+	syntax = "proto3";
+
+	package order;
+
+	option go_package = "proto/order";
+
+	message Created {
+	  string ID = 1;
+		repeated string Items = 2;
+	}
+	
