@@ -1,11 +1,16 @@
-	syntax = "proto3";
+syntax = "proto3";
 
-	package order;
+package order;
 
-	option go_package = "proto/order";
+option go_package = "proto/order";
 
-	message Created {
-	  string ID = 1;
-		repeated string Items = 2;
-	}
-	
+message Created {
+	string ID = 1;
+	string CustomerName = 2;
+	repeated OrderItem Items = 3;
+}
+
+message OrderItem {
+	string Type = 1;
+	string Size = 2;
+}
