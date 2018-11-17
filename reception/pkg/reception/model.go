@@ -7,14 +7,16 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/italolelis/reception/pkg/coffees"
 	uuid "github.com/satori/go.uuid"
 )
 
 // Order represents a coffee order
 type Order struct {
-	ID        uuid.UUID `json:"id" db:"id"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	Items     Items     `json:"items" db:"items"`
+	ID           uuid.UUID `json:"id" db:"id"`
+	CreatedAt    time.Time `json:"created_at" db:"created_at"`
+	Items        Items     `json:"items" db:"items"`
+	CustomerName string    `json:"customer_name" db:"customer_name"`
 }
 
 // Items are a collection of order items
@@ -22,15 +24,16 @@ type Items []*Item
 
 // Item represents the order item
 type Item struct {
-	Type  string  `json:"type" db:"type"`
-	Price float32 `json:"price" db:"price"`
+	Coffee *coffees.Coffee
+	Size   string `json:"size" db:"size"`
 }
 
 // NewOrder creates a new instance of Order
-func NewOrder() *Order {
+func NewOrder(customerName string) *Order {
 	return &Order{
-		ID:        uuid.NewV4(),
-		CreatedAt: time.Now(),
+		ID:           uuid.NewV4(),
+		CreatedAt:    time.Now(),
+		CustomerName: customerName,
 	}
 }
 
