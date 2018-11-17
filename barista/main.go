@@ -51,11 +51,11 @@ func main() {
 	}
 	defer close(messages)
 
-	logger.Info("listening for messages...")
+	logger.Debug("listening for messages...")
 	for {
 		m, ok := <-messages
 		if !ok {
-			logger.Info("stop listening messages!")
+			logger.Debug("stop listening messages!")
 			break
 		}
 
@@ -65,10 +65,13 @@ func main() {
 			logger.Errorw("unmarshaling error", "err", err)
 		}
 
-		logger.Infow("your order is ready", "order_id", o.ID)
+		for _,i:=range o.Items {
+			logger.Infof("%s size %s for %s your order is ready!", i.Type, i.Size, o.CustomerName)
+		}
+
 		m.Ack(false)
 
-		logger.Info("message was consumed")
+		logger.Debug("message was consumed")
 	}
 }
 
