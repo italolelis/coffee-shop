@@ -12,6 +12,7 @@ import (
 	"github.com/satori/go.uuid"
 	"github.com/rafaeljesus/rabbus"
 	"github.com/golang/protobuf/proto"
+	"github.com/italolelis/reception/pkg/coffees"
 )
 
 const (
@@ -19,17 +20,42 @@ const (
 	exchangeType = "topic"
 )
 
+type createOrderRequest struct {
+	Name string `json:"name"`
+	Items []orderItem `json:"items"`
+}
+
+type orderItem struct {
+	Type string `json:"type"`
+	Size string `json:"size"`
+}
+
 // CreateOrderHandler is the hander for order creation
-func CreateOrderHandler(repo WriteRepository, eventStream *rabbus.Rabbus) http.HandlerFunc {
+func CreateOrderHandler(repo WriteRepository, coffeeRepo coffees.ReadRepository, eventStream *rabbus.Rabbus) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		var orderReq createOrderRequest
+
 		ctx := r.Context()
 		logger := log.WithContext(ctx)
 
-		o := NewOrder()
 		d := json.NewDecoder(r.Body)
-		if err := d.Decode(&o); err != nil {
+		if err := d.Decode(&orderReq); err != nil {
 			http.Error(w, "could not parse the request body", http.StatusBadRequest)
 			return
+		}
+
+		o := NewOrder(orderReq.Name)
+		for _, i := range orderReq.Items {
+			coffee, err := coffeeRepo.FindOneByName(ctx, i.Type)
+			if err != nil {
+				logger.With("err", err, "name", i.Type).Error("could not find the coffee")
+				continue
+			}
+
+			o.Items = append(o.Items, &Item{
+				Coffee: coffee,
+				Size: i.Size,
+			})
 		}
 
 		logger.Debugw("creating order", "order_id", o.ID)
@@ -40,9 +66,10 @@ func CreateOrderHandler(repo WriteRepository, eventStream *rabbus.Rabbus) http.H
 
 		ev := order.Created{
 			ID: o.ID.String(),
+			CustomerName: o.CustomerName,
 		}
 		for _, i := range o.Items {
-			ev.Items = append(ev.Items, i.Type)
+			ev.Items = append(ev.Items, &order.OrderItem{Type:i.Coffee.Name,Size:i.Size})
 		}
 		
 		if err:= sendEvent(eventStream, "orders.created", &ev); err != nil {

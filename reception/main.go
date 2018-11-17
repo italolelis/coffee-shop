@@ -11,6 +11,7 @@ import (
 	"github.com/italolelis/reception/pkg/config"
 	"github.com/italolelis/kit/log"
 	"github.com/italolelis/reception/pkg/reception"
+	"github.com/italolelis/reception/pkg/coffees"
 	"github.com/jmoiron/sqlx"
 	"github.com/rafaeljesus/rabbus"
 	_ "github.com/lib/pq"
@@ -66,6 +67,8 @@ func main() {
 	wRepo := reception.NewPostgresWriteRepository(db)
 	rRepo := reception.NewPostgresReadRepository(db)
 
+	coffeeReadRepo := coffees.NewPostgresReadRepository(db)
+
 	// creates the router and register the handlers
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
@@ -73,7 +76,7 @@ func main() {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Route("/orders", func(r chi.Router) {
-		r.Post("/", reception.CreateOrderHandler(wRepo, eventStream))
+		r.Post("/", reception.CreateOrderHandler(wRepo, coffeeReadRepo, eventStream))
 		r.Get("/{id}", reception.GetOrderHandler(rRepo))
 	})
 
