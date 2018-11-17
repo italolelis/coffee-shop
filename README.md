@@ -16,8 +16,6 @@ This will setup our 3 services and will make sure they are talking to each other
 
 Reception is the service that is receiving new orders and sending to the `barista` to be done.
 
-### Domain
-
 * We have a simple `orders` API where you can place your orders. An order is only placed after the payment is done successfuly.
 * To keep things simple, we mock the `payments` service with [wiremock](http://wiremock.org) in a separate container where we can simulate failure when necessary.
 
