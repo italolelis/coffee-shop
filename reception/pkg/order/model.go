@@ -1,4 +1,4 @@
-package reception
+package order
 
 import (
 	"database/sql/driver"
@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/italolelis/reception/pkg/coffees"
-	uuid "github.com/satori/go.uuid"
+	"github.com/satori/go.uuid"
 )
 
 // Order represents a coffee order
