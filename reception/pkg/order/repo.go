@@ -1,4 +1,4 @@
-package reception
+package order
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	uuid "github.com/satori/go.uuid"
+	"github.com/satori/go.uuid"
 )
 
 var (
@@ -72,7 +72,7 @@ func NewPostgresReadRepository(db *sqlx.DB) *PostgresReadRepository {
 func (r *PostgresReadRepository) FindOneByID(ctx context.Context, id uuid.UUID) (*Order, error) {
 	var order Order
 
-	if err := r.db.Get(&order, "SELECT * FROM orders WHERE id = $1", id); err != nil {
+	if err := r.db.GetContext(ctx, &order, "SELECT * FROM orders WHERE id = $1", id); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, ErrOrderNotFound
 		}

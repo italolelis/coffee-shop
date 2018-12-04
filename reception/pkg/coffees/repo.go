@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	uuid "github.com/satori/go.uuid"
+	"github.com/satori/go.uuid"
 )
 
 var (
@@ -74,7 +74,7 @@ func NewPostgresReadRepository(db *sqlx.DB) *PostgresReadRepository {
 func (r *PostgresReadRepository) FindOneByID(ctx context.Context, id uuid.UUID) (*Coffee, error) {
 	var c Coffee
 
-	if err := r.db.Get(&c, "SELECT * FROM coffees WHERE id = $1", id); err != nil {
+	if err := r.db.GetContext(ctx, &c, "SELECT * FROM coffees WHERE id = $1", id); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, ErrCoffeeNotFound
 		}
@@ -89,7 +89,7 @@ func (r *PostgresReadRepository) FindOneByID(ctx context.Context, id uuid.UUID) 
 func (r *PostgresReadRepository) FindOneByName(ctx context.Context, name string) (*Coffee, error) {
 	var c Coffee
 
-	if err := r.db.Get(&c, "SELECT * FROM coffees WHERE name = $1", name); err != nil {
+	if err := r.db.GetContext(ctx, &c, "SELECT * FROM coffees WHERE name = $1 LIMIT 1", name); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, ErrCoffeeNotFound
 		}
