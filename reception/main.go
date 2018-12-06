@@ -11,18 +11,15 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/italolelis/kit/log"
-	"github.com/italolelis/reception/pkg/coffees"
+	"github.com/italolelis/kit/metric"
+	"github.com/italolelis/kit/stream"
+	"github.com/italolelis/kit/trace"
 	"github.com/italolelis/reception/pkg/config"
 	"github.com/italolelis/reception/pkg/order"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/rafaeljesus/rabbus"
-	"go.opencensus.io/exporter/jaeger"
-	"go.opencensus.io/exporter/prometheus"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/plugin/ochttp/propagation/b3"
-	"go.opencensus.io/stats/view"
-	"go.opencensus.io/trace"
 )
 
 func main() {
@@ -45,31 +42,23 @@ func main() {
 	}
 	log.SetLevel(cfg.LogLevel)
 
-	db, close := setupDatabase(ctx, cfg.Database)
-	defer close()
+	db, dbClose := setupDatabase(ctx, cfg.Database)
+	defer dbClose()
 
-	metricsHandler := setupMetrics(ctx)
+	metricsHandler := metric.Setup(ctx, cfg.Metrics)
 
-	eventStream, close := setupEventStream(ctx, cfg.EventStream)
-	defer close()
+	eventStream, streamClose := stream.Setup(ctx, cfg.EventStream)
+	defer streamClose()
 
-	flush := setupTracing(ctx, cfg.Tracing)
+	flush := trace.Setup(ctx, cfg.Tracing)
 	defer flush()
-
-	wRepo := order.NewPostgresWriteRepository(db)
-	rRepo := order.NewPostgresReadRepository(db)
-	coffeeReadRepo := coffees.NewPostgresReadRepository(db)
-	orderHandler := order.NewHandler(wRepo, rRepo, coffeeReadRepo, eventStream)
 
 	// creates the router and register the handlers
 	r := chi.NewRouter()
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Handle("/metrics", metricsHandler)
-	r.Route("/orders", func(r chi.Router) {
-		r.Post("/", orderHandler.CreateOrder)
-		r.Get("/{id}", orderHandler.GetOrder)
-	})
+	r.Mount("/orders", order.NewServer(db, eventStream))
 
 	logger.Infow("service running", "port", cfg.Port)
 	logger.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), chi.ServerBaseContext(ctx, &ochttp.Handler{
@@ -101,93 +90,4 @@ func setupDatabase(ctx context.Context, cfg config.Database) (*sqlx.DB, func()) 
 			logger.Fatal(err)
 		}
 	}
-}
-
-// setupEventStream sets up the event stream. In this case is an event broker because we chose rabbitmq
-func setupEventStream(ctx context.Context, cfg config.EventStream) (*rabbus.Rabbus, func()) {
-	logger := log.WithContext(ctx)
-
-	cbStateChangeFunc := func(name, from, to string) {
-		logger.Debugw("rabbitmq state changed", "from", from, "to", to)
-	}
-
-	eventStream, err := rabbus.New(
-		cfg.DSN,
-		rabbus.Durable(true),
-		rabbus.Attempts(cfg.Attempts),
-		rabbus.Sleep(cfg.Backoff),
-		rabbus.Threshold(cfg.Threshold),
-		rabbus.OnStateChange(cbStateChangeFunc),
-	)
-	if err != nil {
-		logger.Fatal(err.Error())
-	}
-
-	go func() {
-		for {
-			select {
-			case <-eventStream.EmitOk():
-				logger.Debug("message sent")
-			case <-eventStream.EmitErr():
-				logger.Debug("message was not sent")
-			}
-		}
-	}()
-
-	go func() {
-		if err := eventStream.Run(ctx); err != nil {
-			logger.Fatal(err)
-		}
-	}()
-
-	return eventStream, func() {
-		if err := eventStream.Close(); err != nil {
-			logger.Error(err.Error())
-		}
-	}
-}
-
-// setupTracing Register the Jaeger exporter to be able to retrieve
-// the collected spans.
-func setupTracing(ctx context.Context, cfg config.Tracing) func() {
-	logger := log.WithContext(ctx)
-
-	exporter, err := jaeger.NewExporter(jaeger.Options{
-		CollectorEndpoint: cfg.CollectorEndpoint,
-		Process: jaeger.Process{
-			ServiceName: cfg.ServiceName,
-		},
-	})
-	if err != nil {
-		logger.Errorw("could not create the jaeger exporter", "err", err)
-	}
-
-	trace.RegisterExporter(exporter)
-	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
-
-	return func() { exporter.Flush() }
-}
-
-// setupMetrics sets up the application metrics
-func setupMetrics(ctx context.Context) http.Handler {
-	logger := log.WithContext(ctx)
-
-	if err := view.Register(
-		ochttp.ClientSentBytesDistribution,
-		ochttp.ClientReceivedBytesDistribution,
-		ochttp.ClientRoundtripLatencyDistribution,
-	); err != nil {
-		logger.Fatal(err)
-	}
-
-	exporter, err := prometheus.NewExporter(prometheus.Options{
-		Namespace: "coffee-shop",
-	})
-	if err != nil {
-		logger.Fatalw("failed to create the prometheus stats exporter", "err", err.Error())
-	}
-	view.RegisterExporter(exporter)
-	view.SetReportingPeriod(1 * time.Second)
-
-	return exporter
 }
