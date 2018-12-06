@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"go.opencensus.io/trace"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -15,6 +14,7 @@ import (
 	"github.com/italolelis/reception/pkg/coffees"
 	"github.com/rafaeljesus/rabbus"
 	"github.com/satori/go.uuid"
+	"go.opencensus.io/trace"
 )
 
 const (
@@ -23,13 +23,11 @@ const (
 )
 
 type createOrderRequest struct {
-	Name  string      `json:"name"`
-	Items []orderItem `json:"items"`
-}
-
-type orderItem struct {
-	Type string `json:"type"`
-	Size string `json:"size"`
+	Name  string `json:"name"`
+	Items []struct {
+		Type string `json:"type"`
+		Size string `json:"size"`
+	} `json:"items"`
 }
 
 type Handler struct {
@@ -128,6 +126,7 @@ func (h *Handler) GetOrder(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) sendEvent(ctx context.Context, key string, payload proto.Message) error {
 	ctx, span := trace.StartSpan(ctx, "rabbitmq:send", trace.WithSpanKind(trace.SpanKindClient))
+	span.AddAttributes(trace.StringAttribute("exchange", exchangeName), trace.StringAttribute("key", key))
 	defer span.End()
 
 	data, err := proto.Marshal(payload)

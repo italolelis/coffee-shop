@@ -34,9 +34,9 @@ func NewPostgresWriteRepository(db *sqlx.DB) *PostgresWriteRepository {
 // Add adds a repository rule
 func (r *PostgresWriteRepository) Add(ctx context.Context, o *Order) error {
 	if _, err := r.db.NamedExecContext(ctx, `INSERT INTO orders 
-		VALUES (:id, :items, :created_at)
+		VALUES (:id, :items, :created_at, :customer_name)
 			ON CONFLICT (id) DO
-		UPDATE SET (items) = (:items)
+		UPDATE SET (items, customer_name) = (:items, :customer_name)
 	`, o); err != nil {
 		return fmt.Errorf("could not insert an order: %s", err.Error())
 	}
