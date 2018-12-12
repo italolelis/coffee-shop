@@ -1,2 +1,0 @@
-POST http://localhost:9010/orders 
-@load-test/order.json
