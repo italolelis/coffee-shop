@@ -16,44 +16,44 @@ services:
   #            JAEGER_AGENT_PORT: 6831
   #            JAEGER_SAMPLER_MANAGER_HOST_PORT: "jaeger:5778"
 
-    # barista:
-    #     build: 
-    #         context: "./"
-    #         dockerfile: "./Dockerfile_barista"
-    #     environment:
-    #         LOG_LEVEL: debug
-    #         EVENT_STREAM_DSN: amqp://rabbit/
+  # barista:
+  #     build:
+  #         context: "./"
+  #         dockerfile: "./Dockerfile_barista"
+  #     environment:
+  #         LOG_LEVEL: debug
+  #         EVENT_STREAM_DSN: amqp://rabbit/
 
-    payments:
-        image: rodolpheche/wiremock
-        ports:
-            - '8081'
-        volumes:
-            - ./payments:/home/wiremock/mappings
+  payments:
+    image: rodolpheche/wiremock
+    ports:
+      - '8081'
+    volumes:
+      - ./payments:/home/wiremock/mappings
 
-    reception_db:
-        image: postgres:9.6
-        ports:
-            - '5432:5432'
-        environment:
-            LC_ALL: C.UTF-8
-            POSTGRES_USER: coffee
-            POSTGRES_PASSWORD: qwerty123
-            POSTGRES_DB: reception
+  reception_db:
+    image: postgres:9.6
+    ports:
+      - '5432:5432'
+    environment:
+      LC_ALL: C.UTF-8
+      POSTGRES_USER: coffee
+      POSTGRES_PASSWORD: qwerty123
+      POSTGRES_DB: reception
 
-    rabbit:
-        image: rabbitmq:3.6-management-alpine
-        ports:
-            - "5672:5672"
-            - "15672:15672"
+  rabbit:
+    image: rabbitmq:3.6-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
 
-    jaeger:
-      image: jaegertracing/all-in-one:latest
-      ports:
-        - "5775:5775/udp"
-        - "6831:6831/udp"
-        - "6832:6832/udp"
-        - "5778:5778"
-        - "16686:16686"
-        - "14268:14268"
-        - "9411:9411"
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "9411:9411"

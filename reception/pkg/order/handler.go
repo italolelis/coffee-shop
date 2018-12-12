@@ -42,7 +42,7 @@ func NewHandler(wRepo WriteRepository, rRepo ReadRepository, coffeeReadRepo coff
 	return &Handler{wRepo: wRepo, rRepo: rRepo, coffeeReadRepo: coffeeReadRepo, es: es}
 }
 
-// CreateOrder is the handler for order creation
+// CreateCoffee is the handler for order creation
 func (h *Handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	var orderReq createOrderRequest
 
@@ -95,7 +95,7 @@ func (h *Handler) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-// GetOrder is the handler for getting a single order
+// GetCoffee is the handler for getting a single order
 func (h *Handler) GetOrder(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	logger := log.WithContext(ctx)
@@ -117,7 +117,7 @@ func (h *Handler) GetOrder(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		http.Error(w, "unkown error when retreiving the order", http.StatusInternalServerError)
+		http.Error(w, "unknown error when retrieving the order", http.StatusInternalServerError)
 		return
 	}
 

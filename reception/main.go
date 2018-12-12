@@ -14,6 +14,7 @@ import (
 	"github.com/italolelis/kit/metric"
 	"github.com/italolelis/kit/stream"
 	"github.com/italolelis/kit/trace"
+	"github.com/italolelis/reception/pkg/coffees"
 	"github.com/italolelis/reception/pkg/config"
 	"github.com/italolelis/reception/pkg/order"
 	"github.com/jmoiron/sqlx"
@@ -59,6 +60,7 @@ func main() {
 
 	r.Handle("/metrics", metricsHandler)
 	r.Mount("/orders", order.NewServer(db, eventStream))
+	r.Mount("/coffees", coffees.NewServer(db))
 
 	logger.Infow("service running", "port", cfg.Port)
 	logger.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), chi.ServerBaseContext(ctx, &ochttp.Handler{

@@ -2,14 +2,40 @@ package main
 
 import (
 	"context"
-	"github.com/italolelis/kit/stream"
 
-	"github.com/golang/protobuf/proto"
+	"github.com/italolelis/barista/pkg/coffee"
 	"github.com/italolelis/barista/pkg/config"
+	"github.com/italolelis/barista/pkg/staff"
 	"github.com/italolelis/kit/log"
-	"github.com/italolelis/kit/proto/order"
+	"github.com/italolelis/kit/stream"
 	"github.com/rafaeljesus/rabbus"
 )
+
+var workforce = []*staff.Barista{
+	{
+		Name: "Thomas",
+		Skills: []coffee.Coffee{
+			&coffee.Espresso{},
+			&coffee.Cappuccino{},
+		},
+	},
+	{
+		Name: "Sofia",
+		Skills: []coffee.Coffee{
+			&coffee.Espresso{},
+			&coffee.Cappuccino{},
+			&coffee.Latte{},
+		},
+	},
+	{
+		Name: "John",
+		Skills: []coffee.Coffee{
+			&coffee.Espresso{},
+			&coffee.Cappuccino{},
+			&coffee.Latte{},
+		},
+	},
+}
 
 func main() {
 	// creates a cancel context
@@ -18,9 +44,13 @@ func main() {
 
 	// gets the contextual logging
 	logger := log.WithContext(ctx)
-	defer logger.Sync()
+	defer func() {
+		if err := logger.Sync(); err != nil {
+			logger.Fatal(err)
+		}
+	}()
 
-	// loads the configuration from the enviroment
+	// loads the configuration from the environment
 	cfg, err := config.Load()
 	if err != nil {
 		logger.Fatal(err.Error())
@@ -42,26 +72,26 @@ func main() {
 	}
 	defer close(messages)
 
-	logger.Debug("listening for messages...")
+	// Setup buffered input/output queues for the workers
+	results := make(chan *staff.OrderDone, 512)
+
+	for _, b := range workforce {
+		go b.Prepare(ctx, messages, results)
+	}
+
 	for {
-		m, ok := <-messages
+		o, ok := <-results
 		if !ok {
-			logger.Debug("stop listening messages!")
+			logger.Debug("stop listening done orders!")
 			break
 		}
 
-		o := order.Created{}
-		err = proto.Unmarshal(m.Body, &o)
-		if err != nil {
-			logger.Errorw("unmarshaling error", "err", err)
-		}
-
-		for _, i := range o.Items {
-			logger.Infof("%s size %s for %s your order is ready!", i.Type, i.Size, o.CustomerName)
-		}
-
-		m.Ack(false)
-
-		logger.Debug("message was consumed")
+		logger.Infof(
+			"%s -> %s size %s for %s your order is ready!",
+			o.DoneBy.Name,
+			o.Type,
+			o.Size,
+			o.CustomerName,
+		)
 	}
 }

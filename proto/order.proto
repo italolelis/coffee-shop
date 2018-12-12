@@ -5,12 +5,12 @@ package order;
 option go_package = "proto/order";
 
 message Created {
-	string ID = 1;
-	string CustomerName = 2;
-	repeated OrderItem Items = 3;
+    string ID = 1;
+    string CustomerName = 2;
+    repeated OrderItem Items = 3;
 }
 
 message OrderItem {
-	string Type = 1;
-	string Size = 2;
+    string Type = 1;
+    string Size = 2;
 }
