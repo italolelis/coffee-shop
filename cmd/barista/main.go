@@ -3,36 +3,36 @@ package main
 import (
 	"context"
 
-	"github.com/italolelis/barista/pkg/coffee"
-	"github.com/italolelis/barista/pkg/config"
-	"github.com/italolelis/barista/pkg/staff"
-	"github.com/italolelis/kit/log"
-	"github.com/italolelis/kit/stream"
+	"github.com/italolelis/coffee-shop/internal/config"
+	"github.com/italolelis/coffee-shop/internal/log"
+	"github.com/italolelis/coffee-shop/internal/stream"
+	"github.com/italolelis/coffee-shop/pkg/coffees"
+	"github.com/italolelis/coffee-shop/pkg/staff"
 	"github.com/rafaeljesus/rabbus"
 )
 
 var workforce = []*staff.Barista{
 	{
 		Name: "Thomas",
-		Skills: []coffee.Coffee{
-			&coffee.Espresso{},
-			&coffee.Cappuccino{},
+		Skills: []coffees.CoffeeType{
+			&coffees.Espresso{},
+			&coffees.Cappuccino{},
 		},
 	},
 	{
 		Name: "Sofia",
-		Skills: []coffee.Coffee{
-			&coffee.Espresso{},
-			&coffee.Cappuccino{},
-			&coffee.Latte{},
+		Skills: []coffees.CoffeeType{
+			&coffees.Espresso{},
+			&coffees.Cappuccino{},
+			&coffees.Latte{},
 		},
 	},
 	{
 		Name: "John",
-		Skills: []coffee.Coffee{
-			&coffee.Espresso{},
-			&coffee.Cappuccino{},
-			&coffee.Latte{},
+		Skills: []coffees.CoffeeType{
+			&coffees.Espresso{},
+			&coffees.Cappuccino{},
+			&coffees.Latte{},
 		},
 	},
 }
@@ -79,6 +79,7 @@ func main() {
 		go b.Prepare(ctx, messages, results)
 	}
 
+	logger.Debug("listening to orders")
 	for {
 		o, ok := <-results
 		if !ok {
