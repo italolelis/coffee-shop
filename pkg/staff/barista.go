@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/italolelis/barista/pkg/coffee"
-	"github.com/italolelis/kit/log"
-	"github.com/italolelis/kit/proto/order"
+	"github.com/italolelis/coffee-shop/internal/log"
+	"github.com/italolelis/coffee-shop/internal/proto/order"
+	"github.com/italolelis/coffee-shop/pkg/coffees"
 	"github.com/rafaeljesus/rabbus"
 )
 
@@ -19,7 +19,7 @@ type OrderDone struct {
 
 type Barista struct {
 	Name   string
-	Skills []coffee.Coffee
+	Skills []coffees.CoffeeType
 }
 
 func (b *Barista) Prepare(ctx context.Context, messages chan rabbus.ConsumerMessage, result chan<- *OrderDone) {

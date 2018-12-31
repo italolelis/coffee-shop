@@ -9,14 +9,14 @@ all: clean deps test build
 # Builds the project
 build:
 	@echo "$(OK_COLOR)==> Building... $(NO_COLOR)"
-	@CGO_ENABLED=0 go build -ldflags "-s -w" -ldflags "-X cmd.version=${VERSION}" -o "dist/reception" github.com/italolelis/reception
+	@CGO_ENABLED=0 go build -ldflags "-s -w" -ldflags "-X cmd.version=${VERSION}" -o "dist/reception" github.com/italolelis/coffee-shop/cmd/reception
 
 test: lint format vet
 	@echo "$(OK_COLOR)==> Running tests$(NO_COLOR)"
 	@go test -v -cover -covermode=atomic ./...
 
 migrate: tools.migrate
-	@./migrate.darwin-amd64 -path="migrations/" -database="postgres://coffee:qwerty123@localhost:5432/reception?sslmode=disable" up
+	@./migrate.darwin-amd64 -path="configs/migrations/" -database="postgres://coffee:qwerty123@localhost:5432/reception?sslmode=disable" up
 
 format:
 	@gofmt -l -s cmd pkg | grep ".*\.go"; if [ "$$?" = "0" ]; then exit 1; fi

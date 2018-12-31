@@ -19,7 +19,7 @@ Think about a coffee-shop. The first thing you normally do when you enter one is
 and order a coffee. Reception is the service that is getting new orders and sending to the `barista` to be done.
 
 In this service we have:
-* RabbitMQ to send messages that are send with [protocol buffers](/proto)
+* RabbitMQ to send messages that are send with [protocol buffers](/configs/proto)
 * Tracing and monitoring using [open census](https://github.com/census-instrumentation/opencensus-go)
 * All calls to external dependencies are wrapped around a Circuit Breaker. You can use a Hystrix dashboard to check for the circuits.
 * To keep things simple, we mock the `payments` service with [wiremock](http://wiremock.org) in a separate container where we can simulate failure when necessary.

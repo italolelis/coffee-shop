@@ -7,7 +7,6 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/italolelis/reception/pkg/coffees"
 	"github.com/satori/go.uuid"
 )
 
@@ -24,17 +23,27 @@ type Items []*Item
 
 // Item represents the order item
 type Item struct {
-	Coffee *coffees.Coffee
-	Size   string `json:"size" db:"size"`
+	Type string `json:"type"`
+	Size string `json:"size" db:"size"`
 }
 
 // NewOrder creates a new instance of Order
-func NewOrder(customerName string) *Order {
+func NewOrder(id uuid.UUID, customerName string) *Order {
 	return &Order{
-		ID:           uuid.NewV4(),
+		ID:           id,
 		CreatedAt:    time.Now(),
 		CustomerName: customerName,
 	}
+}
+
+func NextOrderID() uuid.UUID {
+	return uuid.NewV4()
+}
+
+func (o *Order) AddItems(items Items) *Order {
+	o.Items = items
+
+	return o
 }
 
 // Value return a driver.Value representation of the order items

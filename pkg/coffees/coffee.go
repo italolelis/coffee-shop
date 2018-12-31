@@ -1,11 +1,35 @@
-package coffee
+package coffees
 
 import (
 	"context"
 	"time"
+
+	"github.com/satori/go.uuid"
 )
 
-type Coffee interface {
+// Coffee represents a coffee type
+type Coffee struct {
+	ID        uuid.UUID `json:"id" db:"id"`
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
+	Name      string    `json:"name" db:"name"`
+	Price     float32   `json:"price" db:"price"`
+}
+
+// NewCoffee creates a new instance of Coffee
+func NewCoffee(id uuid.UUID, name string, price float32) *Coffee {
+	return &Coffee{
+		ID:        id,
+		CreatedAt: time.Now(),
+		Name:      name,
+		Price:     price,
+	}
+}
+
+func NextCoffeeID() uuid.UUID {
+	return uuid.NewV4()
+}
+
+type CoffeeType interface {
 	Brew(context.Context)
 	Match(string) bool
 }
