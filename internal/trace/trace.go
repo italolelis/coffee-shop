@@ -2,7 +2,7 @@ package trace
 
 import (
 	"context"
-	"github.com/italolelis/kit/log"
+	"github.com/italolelis/coffee-shop/internal/log"
 	"go.opencensus.io/exporter/jaeger"
 	"go.opencensus.io/trace"
 )
