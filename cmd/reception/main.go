@@ -4,23 +4,23 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"net/http"
-	"time"
 
 	"contrib.go.opencensus.io/integrations/ocsql"
 	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
-	"github.com/italolelis/kit/log"
-	"github.com/italolelis/kit/metric"
-	"github.com/italolelis/kit/stream"
-	"github.com/italolelis/kit/trace"
-	"github.com/italolelis/reception/pkg/coffees"
-	"github.com/italolelis/reception/pkg/config"
-	"github.com/italolelis/reception/pkg/order"
+	"github.com/italolelis/coffee-shop/internal/config"
+	"github.com/italolelis/coffee-shop/internal/log"
+	"github.com/italolelis/coffee-shop/internal/metric"
+	"github.com/italolelis/coffee-shop/internal/stream"
+	"github.com/italolelis/coffee-shop/internal/trace"
+	"github.com/italolelis/coffee-shop/pkg/coffees"
+	"github.com/italolelis/coffee-shop/pkg/http/rest"
+	"github.com/italolelis/coffee-shop/pkg/order"
+	"github.com/italolelis/coffee-shop/pkg/storage/postgres"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/plugin/ochttp/propagation/b3"
+	"net/http"
 )
 
 func main() {
@@ -36,10 +36,19 @@ func main() {
 		}
 	}()
 
+	if err := run(ctx); err != nil {
+		logger.Fatal(err.Error())
+	}
+}
+
+func run(ctx context.Context) error {
+	// gets the contextual logging
+	logger := log.WithContext(ctx)
+
 	// loads the configuration from the environment
 	cfg, err := config.Load()
 	if err != nil {
-		logger.Fatal(err.Error())
+		return err
 	}
 	log.SetLevel(cfg.LogLevel)
 
@@ -54,19 +63,21 @@ func main() {
 	flush := trace.Setup(ctx, cfg.Tracing)
 	defer flush()
 
-	// creates the router and register the handlers
-	r := chi.NewRouter()
-	r.Use(middleware.Timeout(60 * time.Second))
+	// coffee setup
+	cwr := postgres.NewCoffeeWriteRepository(db)
+	crr := postgres.NewCoffeeReadRepository(db)
+	cs := coffees.NewService(cwr, crr)
 
-	r.Handle("/metrics", metricsHandler)
-	r.Mount("/orders", order.NewServer(db, eventStream))
-	r.Mount("/coffees", coffees.NewServer(db))
+	// order setup
+	owr := postgres.NewPostgresOrderWriteRepository(db)
+	orr := postgres.NewPostgresOrderReadRepository(db)
+	os := order.NewService(owr, orr, crr, eventStream)
 
 	logger.Infow("service running", "port", cfg.Port)
-	logger.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), chi.ServerBaseContext(ctx, &ochttp.Handler{
-		Handler:     r,
+	return http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), chi.ServerBaseContext(ctx, &ochttp.Handler{
+		Handler:     rest.NewServer(cs, os, metricsHandler),
 		Propagation: &b3.HTTPFormat{},
-	})))
+	}))
 }
 
 // setupDatabase connects to the primary data store
