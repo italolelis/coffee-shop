@@ -6,10 +6,16 @@ WARN_COLOR=\033[33;01m
 .PHONY: all clean deps test build
 all: clean deps test build
 
+build: build-reception build-barista
+
 # Builds the project
-build:
-	@echo "$(OK_COLOR)==> Building... $(NO_COLOR)"
+build-reception:
+	@echo "$(OK_COLOR)==> Building reception... $(NO_COLOR)"
 	@CGO_ENABLED=0 go build -ldflags "-s -w" -ldflags "-X cmd.version=${VERSION}" -o "dist/reception" github.com/italolelis/coffee-shop/cmd/reception
+
+build-barista:
+	@echo "$(OK_COLOR)==> Building barista... $(NO_COLOR)"
+	@CGO_ENABLED=0 go build -ldflags "-s -w" -ldflags "-X cmd.version=${VERSION}" -o "dist/reception" github.com/italolelis/coffee-shop/cmd/barista
 
 test: lint format vet
 	@echo "$(OK_COLOR)==> Running tests$(NO_COLOR)"

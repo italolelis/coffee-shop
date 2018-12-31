@@ -67,7 +67,7 @@ func (r *CoffeeReadRepository) FindOneByID(ctx context.Context, id uuid.UUID) (*
 	return &c, nil
 }
 
-// FindOneByID find one order by ID
+// FindOneByName find one order by ID
 func (r *CoffeeReadRepository) FindOneByName(ctx context.Context, name string) (*coffees.Coffee, error) {
 	var c coffees.Coffee
 

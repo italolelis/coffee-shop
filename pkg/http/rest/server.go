@@ -15,6 +15,7 @@ type Server struct {
 	router chi.Router
 }
 
+// NewServer creates a new rest server
 func NewServer(cs coffees.Service, os order.Service, metricsHandler http.Handler) *Server {
 	// creates the router and register the handlers
 	r := chi.NewRouter()

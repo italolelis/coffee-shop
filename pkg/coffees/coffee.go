@@ -25,41 +25,52 @@ func NewCoffee(id uuid.UUID, name string, price float32) *Coffee {
 	}
 }
 
+// NextCoffeeID generates the next coffee ID
 func NextCoffeeID() uuid.UUID {
 	return uuid.NewV4()
 }
 
+// CoffeeType is an interface for the different coffee preparations
 type CoffeeType interface {
 	Brew(context.Context)
 	Match(string) bool
 }
 
+// Espresso is a type of coffee
 type Espresso struct{}
 
+// Brew the coffee
 func (e *Espresso) Brew(ctx context.Context) {
 	time.Sleep(3 * time.Second)
 }
 
+// Match checks if the given string is the current coffee
 func (e *Espresso) Match(coffeeType string) bool {
 	return coffeeType == "espresso"
 }
 
+// Cappuccino is a type of coffee
 type Cappuccino struct{}
 
+// Brew the coffee
 func (c *Cappuccino) Brew(ctx context.Context) {
 	time.Sleep(6 * time.Second)
 }
 
+// Match checks if the given string is the current coffee
 func (c *Cappuccino) Match(coffeeType string) bool {
 	return coffeeType == "cappuccino"
 }
 
+// Latte is a type of coffee
 type Latte struct{}
 
+// Brew the coffee
 func (l *Latte) Brew(ctx context.Context) {
 	time.Sleep(8 * time.Second)
 }
 
+// Match checks if the given string is the current coffee
 func (l *Latte) Match(coffeeType string) bool {
 	return coffeeType == "latte"
 }

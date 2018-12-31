@@ -36,10 +36,12 @@ func NewOrder(id uuid.UUID, customerName string) *Order {
 	}
 }
 
+// NextOrderID generates the next order ID
 func NextOrderID() uuid.UUID {
 	return uuid.NewV4()
 }
 
+// AddItems adds a list of items to the order
 func (o *Order) AddItems(items Items) *Order {
 	o.Items = items
 

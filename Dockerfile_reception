@@ -2,11 +2,10 @@ FROM golang:1.11-alpine AS builder
 
 WORKDIR /app
 
-COPY ./reception ./reception
-COPY ./kit ./kit
+COPY ./ ./reception
 
 RUN apk add --update bash make git gcc libc-dev
-RUN cd ./reception && make
+RUN cd ./reception && make build-reception
 
 # ---
 

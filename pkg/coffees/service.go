@@ -40,15 +40,18 @@ type Service interface {
 	RequestCoffee(ctx context.Context, coffeeID string) (*Coffee, error)
 }
 
+// ServiceImp is the implementation of the service
 type ServiceImp struct {
 	wRepo WriteRepository
 	rRepo ReadRepository
 }
 
+// NewService creates a new instance of ServiceImp
 func NewService(wRepo WriteRepository, rRepo ReadRepository) *ServiceImp {
 	return &ServiceImp{wRepo: wRepo, rRepo: rRepo}
 }
 
+// CreateCoffee creates a new coffee
 func (s *ServiceImp) CreateCoffee(ctx context.Context, name string, price float32) (uuid.UUID, error) {
 	if name == "" {
 		return uuid.Nil, ErrInvalidName
@@ -66,6 +69,7 @@ func (s *ServiceImp) CreateCoffee(ctx context.Context, name string, price float3
 	return c.ID, nil
 }
 
+// RequestCoffee retrieves one coffee
 func (s *ServiceImp) RequestCoffee(ctx context.Context, coffeeID string) (*Coffee, error) {
 	id, err := uuid.FromString(coffeeID)
 	if err != nil {

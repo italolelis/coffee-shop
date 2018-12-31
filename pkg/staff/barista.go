@@ -10,6 +10,7 @@ import (
 	"github.com/rafaeljesus/rabbus"
 )
 
+// OrderDone holds the details of the order that is done
 type OrderDone struct {
 	CustomerName string
 	DoneBy       *Barista
@@ -17,11 +18,13 @@ type OrderDone struct {
 	Size         string
 }
 
+// Barista represents a barista
 type Barista struct {
 	Name   string
 	Skills []coffees.CoffeeType
 }
 
+// Prepare prepares the incoming orders
 func (b *Barista) Prepare(ctx context.Context, messages chan rabbus.ConsumerMessage, result chan<- *OrderDone) {
 	logger := log.WithContext(ctx)
 

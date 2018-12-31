@@ -51,6 +51,7 @@ type Service interface {
 	RequestOrder(ctx context.Context, orderID string) (*Order, error)
 }
 
+// ServiceImp is the implementation of the service
 type ServiceImp struct {
 	wRepo   WriteRepository
 	rRepo   ReadRepository
@@ -58,10 +59,12 @@ type ServiceImp struct {
 	es      *rabbus.Rabbus
 }
 
+// NewService creates a new instance of ServiceImp
 func NewService(wRepo WriteRepository, rRepo ReadRepository, coffees coffees.ReadRepository, es *rabbus.Rabbus) *ServiceImp {
 	return &ServiceImp{wRepo: wRepo, rRepo: rRepo, coffees: coffees, es: es}
 }
 
+// CreateOrder creates a new order for the barista
 func (s *ServiceImp) CreateOrder(ctx context.Context, name string, items Items) (uuid.UUID, error) {
 	if name == "" {
 		return uuid.Nil, ErrInvalidName
@@ -100,6 +103,7 @@ func (s *ServiceImp) CreateOrder(ctx context.Context, name string, items Items) 
 	return o.ID, nil
 }
 
+// RequestOrder retrieves an order
 func (s *ServiceImp) RequestOrder(ctx context.Context, orderID string) (*Order, error) {
 	id, err := uuid.FromString(orderID)
 	if err != nil {
