@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/italolelis/coffee-shop/pkg/coffees"
+	"github.com/italolelis/coffee-shop/internal/app/coffees"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/satori/go.uuid"

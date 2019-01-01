@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/italolelis/coffee-shop/internal/log"
+	"github.com/italolelis/coffee-shop/internal/pkg/log"
 	"go.opencensus.io/exporter/prometheus"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/stats/view"

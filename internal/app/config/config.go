@@ -1,9 +1,9 @@
 package config
 
 import (
-	"github.com/italolelis/coffee-shop/internal/metric"
-	"github.com/italolelis/coffee-shop/internal/stream"
-	"github.com/italolelis/coffee-shop/internal/trace"
+	"github.com/italolelis/coffee-shop/internal/pkg/metric"
+	"github.com/italolelis/coffee-shop/internal/pkg/stream"
+	"github.com/italolelis/coffee-shop/internal/pkg/trace"
 	"github.com/kelseyhightower/envconfig"
 )
 

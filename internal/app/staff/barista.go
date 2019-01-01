@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/italolelis/coffee-shop/internal/log"
-	"github.com/italolelis/coffee-shop/internal/proto/order"
-	"github.com/italolelis/coffee-shop/pkg/coffees"
+	"github.com/italolelis/coffee-shop/internal/app/coffees"
+	"github.com/italolelis/coffee-shop/internal/pkg/log"
+	"github.com/italolelis/coffee-shop/internal/pkg/proto/order"
 	"github.com/rafaeljesus/rabbus"
 )
 

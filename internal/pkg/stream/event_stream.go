@@ -2,7 +2,7 @@ package stream
 
 import (
 	"context"
-	"github.com/italolelis/coffee-shop/internal/log"
+	"github.com/italolelis/coffee-shop/internal/pkg/log"
 	"github.com/rafaeljesus/rabbus"
 )
 

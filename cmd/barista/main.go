@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 
-	"github.com/italolelis/coffee-shop/internal/config"
-	"github.com/italolelis/coffee-shop/internal/log"
-	"github.com/italolelis/coffee-shop/internal/stream"
-	"github.com/italolelis/coffee-shop/pkg/coffees"
-	"github.com/italolelis/coffee-shop/pkg/staff"
+	"github.com/italolelis/coffee-shop/internal/app/coffees"
+	"github.com/italolelis/coffee-shop/internal/app/config"
+	"github.com/italolelis/coffee-shop/internal/app/staff"
+	"github.com/italolelis/coffee-shop/internal/pkg/log"
+	"github.com/italolelis/coffee-shop/internal/pkg/stream"
 	"github.com/rafaeljesus/rabbus"
 )
 

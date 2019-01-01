@@ -7,8 +7,8 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
-	"github.com/italolelis/coffee-shop/internal/log"
-	"github.com/italolelis/coffee-shop/pkg/coffees"
+	"github.com/italolelis/coffee-shop/internal/app/coffees"
+	"github.com/italolelis/coffee-shop/internal/pkg/log"
 	"go.opencensus.io/trace"
 )
 

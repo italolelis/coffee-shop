@@ -6,8 +6,8 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/italolelis/coffee-shop/pkg/coffees"
-	"github.com/italolelis/coffee-shop/pkg/order"
+	"github.com/italolelis/coffee-shop/internal/app/coffees"
+	"github.com/italolelis/coffee-shop/internal/app/order"
 )
 
 // Server holds the dependencies for a HTTP server.
