@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"net/http"
 
 	"contrib.go.opencensus.io/integrations/ocsql"
 	"github.com/go-chi/chi"
@@ -20,7 +21,6 @@ import (
 	_ "github.com/lib/pq"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/plugin/ochttp/propagation/b3"
-	"net/http"
 )
 
 func main() {

@@ -4,10 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/italolelis/coffee-shop/internal/app/order"
 
+	"github.com/italolelis/coffee-shop/internal/app/order"
 	"github.com/jmoiron/sqlx"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 // OrderWriteRepository is the PostgresSQL repository

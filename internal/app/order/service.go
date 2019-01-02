@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/italolelis/coffee-shop/internal/app/coffees"
 	"github.com/italolelis/coffee-shop/internal/pkg/proto/order"
 	"github.com/rafaeljesus/rabbus"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 	"go.opencensus.io/trace"
 )
 

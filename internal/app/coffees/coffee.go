@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 // Coffee represents a coffee type

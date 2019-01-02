@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 // Order represents a coffee order
