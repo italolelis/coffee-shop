@@ -5,16 +5,21 @@ import (
 	"github.com/italolelis/coffee-shop/internal/pkg/stream"
 	"github.com/italolelis/coffee-shop/internal/pkg/trace"
 	"github.com/kelseyhightower/envconfig"
+	"time"
 )
 
 // Config is the application configuration
 type Config struct {
-	Port        int    `default:"8080"`
-	LogLevel    string `envconfig:"LOG_LEVEL"`
-	Database    Database
-	EventStream stream.EventStream
-	Tracing     trace.Tracing
-	Metrics     metric.Metrics
+	Port              int           `default:"8080"`
+	LogLevel          string        `envconfig:"LOG_LEVEL"`
+	ReadTimeout       time.Duration `envconfig:"READ_TIMEOUT" default:"5s"`
+	ReadHeaderTimeout time.Duration `envconfig:"READ_HEADER_TIMEOUT" default:"5s"`
+	WriteTimeout      time.Duration `envconfig:"WRITE_TIMEOUT"  default:"10s"`
+	IdleTimeout       time.Duration `envconfig:"IDLE_TIMEOUT"  default:"120s"`
+	Database          Database
+	EventStream       stream.EventStream
+	Tracing           trace.Tracing
+	Metrics           metric.Metrics
 }
 
 // Database holds the database configurations

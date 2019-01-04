@@ -74,10 +74,19 @@ func run(ctx context.Context) error {
 	os := order.NewService(owr, orr, crr, eventStream)
 
 	logger.Infow("service running", "port", cfg.Port)
-	return http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), chi.ServerBaseContext(ctx, &ochttp.Handler{
-		Handler:     rest.NewServer(cs, os, metricsHandler),
-		Propagation: &b3.HTTPFormat{},
-	}))
+	srv := &http.Server{
+		Addr:              fmt.Sprintf(":%d", cfg.Port),
+		ReadTimeout:       cfg.ReadTimeout,
+		ReadHeaderTimeout: cfg.ReadHeaderTimeout,
+		WriteTimeout:      cfg.WriteTimeout,
+		IdleTimeout:       cfg.IdleTimeout,
+		Handler: chi.ServerBaseContext(ctx, &ochttp.Handler{
+			Handler:     rest.NewServer(cs, os, metricsHandler),
+			Propagation: &b3.HTTPFormat{},
+		}),
+	}
+
+	return srv.ListenAndServe()
 }
 
 // setupDatabase connects to the primary data store
