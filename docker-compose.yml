@@ -6,20 +6,19 @@ volumes:
 
 services:
 
-  #     reception:
-  #         build:
-  #             context: "./"
-  #             dockerfile: "./Dockerfile_reception"
-  #         ports:
-  #             - '9010:8080'
-  #         environment:
-  #            LOG_LEVEL: debug
-  #            DATABASE_DSN: postgres://coffee:qwerty123@reception_db/reception?sslmode=disable
-  #            EVENT_STREAM_DSN: amqp://rabbit/
-  #            JAEGER_SERVICE_NAME: "reception"
-  #            JAEGER_AGENT_HOST: "jaeger"
-  #            JAEGER_AGENT_PORT: 6831
-  #            JAEGER_SAMPLER_MANAGER_HOST_PORT: "jaeger:5778"
+  reception:
+    build:
+      context: "./"
+      dockerfile: "./Dockerfile_reception"
+    ports:
+      - '9010:8080'
+    environment:
+      LOG_LEVEL: debug
+      DATABASE_DSN: postgres://coffee:qwerty123@reception_db/reception?sslmode=disable
+      EVENT_STREAM_DSN: amqp://rabbit/
+      JAEGER_SERVICE_NAME: "reception"
+      JAEGER_COLLECTOR_ENDPOINT: "http://localhost:14268/api/traces?format=jaeger.thrift"
+      METRICS_SERVICE_NAME: "reception"
 
   # barista:
   #     build:
@@ -28,6 +27,9 @@ services:
   #     environment:
   #         LOG_LEVEL: debug
   #         EVENT_STREAM_DSN: amqp://rabbit/
+  #         JAEGER_SERVICE_NAME: "reception"
+  #         JAEGER_COLLECTOR_ENDPOINT: "http://localhost:14268/api/traces?format=jaeger.thrift"
+  #         METRICS_SERVICE_NAME: "reception"
 
   payments:
     image: rodolpheche/wiremock
