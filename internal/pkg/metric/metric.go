@@ -15,9 +15,16 @@ func Setup(ctx context.Context, cfg Metrics) http.Handler {
 	logger := log.WithContext(ctx)
 
 	if err := view.Register(
+		ochttp.ClientCompletedCount,
 		ochttp.ClientSentBytesDistribution,
 		ochttp.ClientReceivedBytesDistribution,
 		ochttp.ClientRoundtripLatencyDistribution,
+		ochttp.ServerRequestCountView,
+		ochttp.ServerRequestBytesView,
+		ochttp.ServerResponseBytesView,
+		ochttp.ServerLatencyView,
+		ochttp.ServerRequestCountByMethod,
+		ochttp.ServerResponseCountByStatusCode,
 	); err != nil {
 		logger.Fatal(err)
 	}
