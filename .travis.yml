@@ -1,16 +1,20 @@
 language: go
+go:
+  - "1.11.x"
 
 services:
   - docker
 
-before_script:
-  - make test
+env:
+  - GO111MODULE=on
 
-script:
-  - docker build -t italolelis/reception:$TRAVIS_COMMIT .
-  - docker build -t italolelis/barista:$TRAVIS_COMMIT .
+install: true
+
+script: make test
 
 after_script:
+  - docker build -t italolelis/reception:$TRAVIS_COMMIT .
+  - docker build -t italolelis/barista:$TRAVIS_COMMIT .
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   - docker push italolelis/reception:$TRAVIS_COMMIT
   - docker push italolelis/barista:$TRAVIS_COMMIT
