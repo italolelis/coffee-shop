@@ -39,6 +39,7 @@ func (r *CoffeeReadWriteRepository) FindOneByName(ctx context.Context, name stri
 	return nil, coffees.ErrCoffeeNotFound
 }
 
+// FindAll finds all coffees
 func (r *CoffeeReadWriteRepository) FindAll(ctx context.Context) ([]*coffees.Coffee, error) {
 	return r.data, nil
 }
