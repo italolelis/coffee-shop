@@ -7,7 +7,7 @@ import (
 
 	"github.com/italolelis/coffee-shop/internal/app/coffees"
 	"github.com/jmoiron/sqlx"
-	uuid "github.com/satori/go.uuid"
+	"github.com/satori/go.uuid"
 )
 
 // CoffeeWriteRepository is the coffee PostgresSQL repository
@@ -15,7 +15,7 @@ type CoffeeWriteRepository struct {
 	db *sqlx.DB
 }
 
-// NewCoffeeWriteRepository creates a new instance of OrderWriteRepository
+// NewCoffeeWriteRepository creates a new instance of CoffeeWriteRepository
 func NewCoffeeWriteRepository(db *sqlx.DB) *CoffeeWriteRepository {
 	return &CoffeeWriteRepository{db}
 }
@@ -27,7 +27,7 @@ func (r *CoffeeWriteRepository) Add(ctx context.Context, o *coffees.Coffee) erro
 			ON CONFLICT (id) DO
 		UPDATE SET (name, price) = (:name, :price)
 	`, o); err != nil {
-		return fmt.Errorf("could not insert an order: %s", err.Error())
+		return fmt.Errorf("could not insert a coffee: %s", err.Error())
 	}
 
 	return nil
@@ -47,12 +47,12 @@ type CoffeeReadRepository struct {
 	db *sqlx.DB
 }
 
-// NewCoffeeReadRepository creates a new instance of OrderReadRepository
+// NewCoffeeReadRepository creates a new instance of CoffeeReadRepository
 func NewCoffeeReadRepository(db *sqlx.DB) *CoffeeReadRepository {
 	return &CoffeeReadRepository{db}
 }
 
-// FindOneByID find one order by ID
+// FindOneByID find one coffee by ID
 func (r *CoffeeReadRepository) FindOneByID(ctx context.Context, id uuid.UUID) (*coffees.Coffee, error) {
 	var c coffees.Coffee
 
@@ -67,7 +67,7 @@ func (r *CoffeeReadRepository) FindOneByID(ctx context.Context, id uuid.UUID) (*
 	return &c, nil
 }
 
-// FindOneByName find one order by ID
+// FindOneByName find one coffee by ID
 func (r *CoffeeReadRepository) FindOneByName(ctx context.Context, name string) (*coffees.Coffee, error) {
 	var c coffees.Coffee
 
