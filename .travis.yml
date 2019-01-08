@@ -4,7 +4,7 @@ services:
   - docker
 
 before_script:
-  - make tests
+  - make test
 
 script:
   - docker build -t italolelis/reception:$TRAVIS_COMMIT .
