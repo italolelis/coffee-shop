@@ -1,0 +1,16 @@
+language: go
+
+services:
+  - docker
+
+before_script:
+  - make tests
+
+script:
+  - docker build -t italolelis/reception:$TRAVIS_COMMIT .
+  - docker build -t italolelis/barista:$TRAVIS_COMMIT .
+
+after_script:
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - docker push italolelis/reception:$TRAVIS_COMMIT
+  - docker push italolelis/barista:$TRAVIS_COMMIT
