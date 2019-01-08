@@ -25,7 +25,7 @@ migrate: tools.migrate
 	@./migrate.darwin-amd64 -path="configs/migrations/" -database="postgres://coffee:qwerty123@localhost:5432/reception?sslmode=disable" up
 
 format:
-	@gofmt -l -s cmd pkg | grep ".*\.go"; if [ "$$?" = "0" ]; then exit 1; fi
+	@gofmt -l -s cmd internal | grep ".*\.go"; if [ "$$?" = "0" ]; then exit 1; fi
 
 vet:
 	@echo "$(OK_COLOR)==> checking code correctness with 'go vet' tool$(NO_COLOR)"
