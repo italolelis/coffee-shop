@@ -2,11 +2,66 @@ package coffees
 
 import (
 	"context"
-	"github.com/italolelis/coffee-shop/internal/app/storage/inmem"
+	"testing"
+
 	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
+
+// mockRepo is an in memory coffees repository. It's mostly used for testing
+type mockRepo struct {
+	data []*Coffee
+}
+
+// NewCoffeeReadWriteRepository creates a new instance of mockRepo
+func newMockRepo() *mockRepo {
+	return &mockRepo{}
+}
+
+// FindOneByID find one coffee by ID
+func (r *mockRepo) FindOneByID(ctx context.Context, id uuid.UUID) (*Coffee, error) {
+	for _, c := range r.data {
+		if c.ID == id {
+			return c, nil
+		}
+	}
+
+	return nil, ErrCoffeeNotFound
+}
+
+// FindOneByName find one coffee by name
+func (r *mockRepo) FindOneByName(ctx context.Context, name string) (*Coffee, error) {
+	for _, c := range r.data {
+		if c.Name == name {
+			return c, nil
+		}
+	}
+
+	return nil, ErrCoffeeNotFound
+}
+
+// FindAll finds all coffees
+func (r *mockRepo) FindAll(ctx context.Context) ([]*Coffee, error) {
+	return r.data, nil
+}
+
+// Add adds a repository coffee
+func (r *mockRepo) Add(ctx context.Context, c *Coffee) error {
+	r.data = append(r.data, c)
+	return nil
+}
+
+// Remove removes a repository rule
+func (r *mockRepo) Remove(ctx context.Context, id uuid.UUID) error {
+	for i, c := range r.data {
+		if c.ID == id {
+			r.data = append(r.data[:i], r.data[i+1:]...)
+			return nil
+		}
+	}
+
+	return ErrCoffeeNotFound
+}
 
 func TestService(t *testing.T) {
 	t.Parallel()
@@ -42,7 +97,7 @@ func TestService(t *testing.T) {
 
 func testCreateCoffeeSuccessfully(t *testing.T) {
 	ctx := context.Background()
-	r := inmem.NewCoffeeReadWriteRepository()
+	r := newMockRepo()
 	s := NewService(r, r)
 
 	id, err := s.CreateCoffee(ctx, "test", 1.70)
@@ -59,7 +114,7 @@ func testCreateCoffeeSuccessfully(t *testing.T) {
 
 func testCoffeeCreatingWithMissingArgs(t *testing.T) {
 	ctx := context.Background()
-	r := inmem.NewCoffeeReadWriteRepository()
+	r := newMockRepo()
 	s := NewService(r, r)
 
 	id, err := s.CreateCoffee(ctx, "", 1.70)
@@ -75,7 +130,7 @@ func testCoffeeCreatingWithMissingArgs(t *testing.T) {
 
 func testRequestCoffeeWithWrongID(t *testing.T) {
 	ctx := context.Background()
-	r := inmem.NewCoffeeReadWriteRepository()
+	r := newMockRepo()
 	s := NewService(r, r)
 
 	_, err := s.RequestCoffee(ctx, "wrong")
@@ -85,7 +140,7 @@ func testRequestCoffeeWithWrongID(t *testing.T) {
 
 func testRequestInexistentCoffee(t *testing.T) {
 	ctx := context.Background()
-	r := inmem.NewCoffeeReadWriteRepository()
+	r := newMockRepo()
 	s := NewService(r, r)
 
 	_, err := s.RequestCoffee(ctx, uuid.NewV4().String())
