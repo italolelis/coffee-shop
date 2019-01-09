@@ -5,6 +5,9 @@ go:
 services:
   - docker
 
+env:
+  - GO111MODULE=on
+
 install: true
 
 script: make test
