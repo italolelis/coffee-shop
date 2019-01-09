@@ -10,9 +10,7 @@ env:
 
 install: true
 
-script: make test
-
-after_script:
+script:
   - docker build -f ./Dockerfile_reception -t italolelis/reception:$TRAVIS_COMMIT .
   - docker build -f ./Dockerfile_barista -t italolelis/barista:$TRAVIS_COMMIT .
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
