@@ -7,9 +7,7 @@ volumes:
 services:
 
   reception:
-    build:
-      context: "./"
-      dockerfile: "./Dockerfile_reception"
+    image: italolelis/reception
     ports:
       - '9010:8080'
     environment:
@@ -20,16 +18,14 @@ services:
       JAEGER_COLLECTOR_ENDPOINT: "http://localhost:14268/api/traces?format=jaeger.thrift"
       METRICS_SERVICE_NAME: "reception"
 
-  # barista:
-  #     build:
-  #         context: "./"
-  #         dockerfile: "./Dockerfile_barista"
-  #     environment:
-  #         LOG_LEVEL: debug
-  #         EVENT_STREAM_DSN: amqp://rabbit/
-  #         JAEGER_SERVICE_NAME: "reception"
-  #         JAEGER_COLLECTOR_ENDPOINT: "http://localhost:14268/api/traces?format=jaeger.thrift"
-  #         METRICS_SERVICE_NAME: "reception"
+  #  barista:
+  #    image: italolelis/reception
+  #    environment:
+  #      LOG_LEVEL: debug
+  #      EVENT_STREAM_DSN: amqp://rabbit/
+  #      JAEGER_SERVICE_NAME: "reception"
+  #      JAEGER_COLLECTOR_ENDPOINT: "http://localhost:14268/api/traces?format=jaeger.thrift"
+  #      METRICS_SERVICE_NAME: "reception"
 
   payments:
     image: rodolpheche/wiremock

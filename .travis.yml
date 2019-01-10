@@ -15,7 +15,7 @@ jobs:
     - stage: "Tests"
       name: "Unit Tests"
       script: make test
-    - stage: build and deploy
+    - stage: "Build and Deploy"
       if: tag IS present
       name: "Build and deploy reception"
       script:
