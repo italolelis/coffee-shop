@@ -10,20 +10,24 @@ env:
 
 install: true
 
+stages:
+  - "Tests"
+  - name: "Deploy"
+    if: tag IS present
+
 jobs:
   include:
     - stage: "Tests"
       name: "Unit Tests"
       script: make test
-    - stage: "Build and Deploy"
-      if: tag IS present
+    - stage: "Deploy"
       name: "Build and deploy reception"
       script:
-        - docker build -f ./Dockerfile_reception -t italolelis/reception:$TRAVIS_COMMIT .
+        - docker build -f ./Dockerfile_reception -t italolelis/reception:$TRAVIS_TAG .
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-        - docker push italolelis/reception:$TRAVIS_COMMIT
+        - docker push italolelis/reception:$TRAVIS_TAG
     - name: "Build and deploy barista"
       script:
-        - docker build -f ./Dockerfile_barista -t italolelis/barista:$TRAVIS_COMMIT .
+        - docker build -f ./Dockerfile_barista -t italolelis/barista:$TRAVIS_TAG .
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-        - docker push italolelis/barista:$TRAVIS_COMMIT
+        - docker push italolelis/barista:$TRAVIS_TAG
