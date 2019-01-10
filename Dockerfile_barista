@@ -13,5 +13,4 @@ FROM alpine
 
 COPY --from=builder /app/barista/dist/barista /
 
-EXPOSE 8080
 ENTRYPOINT ["/barista"]

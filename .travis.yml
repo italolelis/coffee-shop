@@ -26,8 +26,10 @@ jobs:
         - docker build -f ./Dockerfile_reception -t italolelis/reception:$TRAVIS_TAG .
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
         - docker push italolelis/reception:$TRAVIS_TAG
+        - docker push italolelis/reception
     - name: "Build and deploy barista"
       script:
         - docker build -f ./Dockerfile_barista -t italolelis/barista:$TRAVIS_TAG .
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
         - docker push italolelis/barista:$TRAVIS_TAG
+        - docker push italolelis/barista
