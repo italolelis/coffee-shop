@@ -15,7 +15,7 @@ build-reception:
 
 build-barista:
 	@echo "$(OK_COLOR)==> Building barista... $(NO_COLOR)"
-	@CGO_ENABLED=0 go build -ldflags "-s -w" -ldflags "-X cmd.version=${VERSION}" -o "dist/reception" github.com/italolelis/coffee-shop/cmd/barista
+	@CGO_ENABLED=0 go build -ldflags "-s -w" -ldflags "-X cmd.version=${VERSION}" -o "dist/barista" github.com/italolelis/coffee-shop/cmd/barista
 
 test: lint format vet
 	@echo "$(OK_COLOR)==> Running tests$(NO_COLOR)"
