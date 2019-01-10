@@ -16,13 +16,16 @@ jobs:
       name: "Unit Tests"
       script: make test
     - stage: build
-      name: "Build docker images"
-      script:
-        - docker build -f ./Dockerfile_reception -t italolelis/reception:$TRAVIS_COMMIT .
-        - docker build -f ./Dockerfile_barista -t italolelis/barista:$TRAVIS_COMMIT .
+      name: "Build reception"
+      script: docker build -f ./Dockerfile_reception -t italolelis/reception:$TRAVIS_COMMIT .
+    - name: "Build barista"
+      script: docker build -f ./Dockerfile_barista -t italolelis/barista:$TRAVIS_COMMIT .
     - stage: deploy
-      name: "Build docker images"
+      name: "Deploy to reception DockerHub"
       script:
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
         - docker push italolelis/reception:$TRAVIS_COMMIT
+    - name: "Deploy to barista DockerHub"
+      script:
+        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
         - docker push italolelis/barista:$TRAVIS_COMMIT
