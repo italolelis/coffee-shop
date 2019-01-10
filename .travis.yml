@@ -10,12 +10,19 @@ env:
 
 install: true
 
-script:
-  - make test
-  - docker build -f ./Dockerfile_reception -t italolelis/reception:$TRAVIS_COMMIT .
-  - docker build -f ./Dockerfile_barista -t italolelis/barista:$TRAVIS_COMMIT .
-
-after_success:
-  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - docker push italolelis/reception:$TRAVIS_COMMIT
-  - docker push italolelis/barista:$TRAVIS_COMMIT
+jobs:
+  include:
+    - stage: "Tests"
+      name: "Unit Tests"
+      script: make test
+    - stage: build
+      name: "Build docker images"
+      script:
+        - docker build -f ./Dockerfile_reception -t italolelis/reception:$TRAVIS_COMMIT .
+        - docker build -f ./Dockerfile_barista -t italolelis/barista:$TRAVIS_COMMIT .
+    - stage: deploy
+      name: "Build docker images"
+      script:
+        - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+        - docker push italolelis/reception:$TRAVIS_COMMIT
+        - docker push italolelis/barista:$TRAVIS_COMMIT

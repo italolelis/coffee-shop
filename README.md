@@ -1,5 +1,7 @@
 # Coffee Shop
 
+[![Build Status](https://travis-ci.com/italolelis/coffee-shop.svg?branch=master)](https://travis-ci.com/italolelis/coffee-shop)
+
 This is a example of how we can design an application that is ready to handle unexpected events.
 
 ## Getting Started
