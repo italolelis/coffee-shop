@@ -1,0 +1,90 @@
+# Default values for coffee-shop.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: italolelis/reception
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+  paths: []
+  hosts:
+    - chart-example.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+app:
+  port: 8080
+  log_level: "debug"
+  read_timeout: "5s"
+  read_header_timeout: "5s"
+  writer_timeout: "10s"
+  idle_timeout: "120s"
+  eventStream:
+    attempts: "5"
+    retry_backoff: "2s"
+    retry_threshold: "5"
+  metrics:
+    reporting_period: "1s"
+
+migrations:
+  github_token: ""
+
+jaeger:
+  enabled: true
+  fullname: jaeger
+  probability_factor: "1"
+  collector:
+    service:
+      httpPort: 14268
+
+rabbitmq:
+  enabled: true
+  username: user
+
+# PostgreSQL chart configs
+postgresql:
+  enabled: true
+  postgresqlUsername: coffee
+  postgresqlDatabase: reception
+  service:
+    port: 5432
+
+livenessProbe:
+  enabled: true
+  endpoint: /
+  initialDelaySeconds: 120
+  timeoutSeconds: 5
+  periodSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  endpoint: /
+  initialDelaySeconds: 10
+  timeoutSeconds: 3
+  periodSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
