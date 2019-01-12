@@ -1,0 +1,16 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+#build:
+#  tagPolicy:
+#    sha256: {}
+#  artifacts:
+#    - image: gcr.io/k8s-skaffold/skaffold-helm
+deploy:
+  helm:
+    releases:
+      - name: skaffold-helm
+        chartPath: build/coffee-shop
+        namespace: coffee-shop
+        overrides:
+          image:
+            tag: 0.0.3
