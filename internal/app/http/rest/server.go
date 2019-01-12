@@ -24,6 +24,9 @@ func NewServer(cs coffees.Service, os order.Service, metricsHandler http.Handler
 	ch := coffeeHandler{cs}
 	oh := orderHandler{os}
 
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Welcome to coffee shop"))
+	})
 	r.Handle("/metrics", metricsHandler)
 	r.Mount("/orders", oh.router())
 	r.Mount("/coffees", ch.router())

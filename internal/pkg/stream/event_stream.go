@@ -24,7 +24,7 @@ func Setup(ctx context.Context, cfg EventStream) (*rabbus.Rabbus, func()) {
 		rabbus.OnStateChange(cbStateChangeFunc),
 	)
 	if err != nil {
-		logger.Fatal(err.Error())
+		logger.Fatalw("failed to establish the rabbitmq connection", "err", err.Error())
 	}
 
 	go func() {
@@ -40,13 +40,13 @@ func Setup(ctx context.Context, cfg EventStream) (*rabbus.Rabbus, func()) {
 
 	go func() {
 		if err := eventStream.Run(ctx); err != nil {
-			logger.Fatal(err)
+			logger.Fatalw("failed to initialize rabbitmq channels", "err", err.Error())
 		}
 	}()
 
 	return eventStream, func() {
 		if err := eventStream.Close(); err != nil {
-			logger.Error(err.Error())
+			logger.Errorw("failed to close rabbitmq connection", "err", err.Error())
 		}
 	}
 }
