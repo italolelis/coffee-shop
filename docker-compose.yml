@@ -7,7 +7,7 @@ volumes:
 services:
 
   reception:
-    image: italolelis/reception:0.0.1
+    image: italolelis/reception:0.0.3
     ports:
       - '8080:8080'
     depends_on:
@@ -16,22 +16,22 @@ services:
       - prometheus
       - reception_db
     environment:
-      LOG_LEVEL: debug
-      DATABASE_DSN: postgres://coffee:qwerty123@reception_db/reception?sslmode=disable
-      EVENT_STREAM_DSN: amqp://rabbit/
+      LOG_LEVEL: "debug"
+      DATABASE_DSN: "postgres://coffee:qwerty123@reception_db/reception?sslmode=disable"
+      EVENT_STREAM_DSN: "amqp://rabbit/"
       JAEGER_SERVICE_NAME: "reception"
       JAEGER_COLLECTOR_ENDPOINT: "http://jaeger:14268/api/traces?format=jaeger.thrift"
       METRICS_SERVICE_NAME: "reception"
 
   barista:
-    image: italolelis/reception:0.0.1
+    image: italolelis/barista:0.0.1
     depends_on:
       - rabbit
       - jaeger
       - prometheus
     environment:
-      LOG_LEVEL: debug
-      EVENT_STREAM_DSN: amqp://rabbit/
+      LOG_LEVEL: "debug"
+      EVENT_STREAM_DSN: "amqp://rabbit/"
       JAEGER_SERVICE_NAME: "reception"
       JAEGER_COLLECTOR_ENDPOINT: "http://jaeger:14268/api/traces?format=jaeger.thrift"
       METRICS_SERVICE_NAME: "reception"
@@ -48,10 +48,10 @@ services:
     ports:
       - '5432:5432'
     environment:
-      LC_ALL: C.UTF-8
-      POSTGRES_USER: coffee
-      POSTGRES_PASSWORD: qwerty123
-      POSTGRES_DB: reception
+      LC_ALL: "C.UTF-8"
+      POSTGRES_USER: "coffee"
+      POSTGRES_PASSWORD: "qwerty123"
+      POSTGRES_DB: "reception"
 
   rabbit:
     image: rabbitmq:3.6-management-alpine

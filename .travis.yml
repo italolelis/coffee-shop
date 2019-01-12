@@ -33,3 +33,4 @@ jobs:
         - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
         - docker push italolelis/barista:$TRAVIS_TAG
         - docker push italolelis/barista
+
