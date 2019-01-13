@@ -29,6 +29,7 @@ type AMQPChecker struct {
 	ConsumeTimeout time.Duration
 }
 
+// NewChecker creates a new instance of AMQPChecker
 func NewChecker(opts ...Option) *AMQPChecker {
 	h := AMQPChecker{
 		Exchange:       defaultExchange,
