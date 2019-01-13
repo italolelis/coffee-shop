@@ -1,12 +1,13 @@
 # requirements.yaml
 dependencies:
-  - name: rabbitmq
-    version: "~4.0.5"
+  - name: rabbitmq-ha
+    version: "~1.18.0"
+    repository: "https://kubernetes-charts.storage.googleapis.com"
+    alias: "rabbitmq"
+  - name: postgresql
+    version: "~3.9.1"
     repository: "https://kubernetes-charts.storage.googleapis.com"
     condition: postgresql.enabled
-  - name: postgresql
-    version: "3.9.1"
-    repository: "https://kubernetes-charts.storage.googleapis.com"
   - name: nginx-ingress
-    version: "0.9.4"
+    version: "~0.9.4"
     repository: "https://kubernetes-charts.storage.googleapis.com"

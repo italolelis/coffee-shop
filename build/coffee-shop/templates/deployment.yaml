@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "reception.fullname" . }}
+  name: {{ include "coffee-shop.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "reception.name" . }}
-    helm.sh/chart: {{ include "reception.chart" . }}
+    app.kubernetes.io/name: {{ include "coffee-shop.name" . }}
+    helm.sh/chart: {{ include "coffee-shop.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "reception.name" . }}
+      app.kubernetes.io/name: {{ include "coffee-shop.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "reception.name" . }}
+        app.kubernetes.io/name: {{ include "coffee-shop.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       containers:
@@ -36,21 +36,15 @@ spec:
               value: {{ .Values.app.writer_timeout | quote }}
             - name: IDLE_TIMEOUT
               value: {{ .Values.app.idle_timeout | quote }}
-            - name: EVENT_STREAM_RETRY_ATTEMPTS
-              value: {{ .Values.app.eventStream.attempts | quote }}
-            - name: EVENT_STREAM_RETRY_BACKOFF
-              value: {{ .Values.app.eventStream.retry_backoff | quote }}
-            - name: EVENT_STREAM_RETRY_THRESHOLD
-              value: {{ .Values.app.eventStream.retry_threshold | quote }}
             - name: METRICS_SERVICE_NAME
-              value: {{ include "reception.fullname" . }}
+              value: {{ include "coffee-shop.fullname" . }}
             - name: METRICS_REPORTING_PERIOD
               value: {{ .Values.app.metrics.reporting_period | quote }}
             {{- if .Values.jaeger.enabled }}
             - name: JAEGER_SERVICE_NAME
-              value: {{ include "reception.fullname" . }}
+              value: {{ include "coffee-shop.fullname" . }}
             - name: JAEGER_COLLECTOR_ENDPOINT
-              value: http://{{ template "reception.jaeger.collector.name" . }}:{{ .Values.jaeger.collector.service.httpPort }}/api/traces?format=jaeger.thrift
+              value: http://{{ template "coffee-shop.jaeger.collector.name" . }}:{{ .Values.jaeger.collector.service.httpPort }}/api/traces?format=jaeger.thrift
             - name: JAEGER_PROBABILITY_FACTOR
               value: {{ default 1 .Values.jaeger.probability_factor | quote }}
             {{- end }}
@@ -58,20 +52,29 @@ spec:
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "reception.postgresql.fullname" . }}
+                  name: {{ template "coffee-shop.postgresql.fullname" . }}
                   key: postgresql-password
             - name: DATABASE_DSN
-              value: postgres://{{ .Values.postgresql.postgresqlUsername }}:$(DATABASE_PASSWORD)@{{ template "reception.postgresql.fullname" . }}/{{ .Values.postgresql.postgresqlDatabase }}?sslmode=disable
+              value: postgres://{{ .Values.postgresql.postgresqlUsername }}:$(DATABASE_PASSWORD)@{{ template "coffee-shop.postgresql.fullname" . }}/{{ .Values.postgresql.postgresqlDatabase }}?sslmode=disable
             {{- end }}
-            {{- if .Values.rabbitmq.enabled }}
+            - name: EVENT_STREAM_RETRY_ATTEMPTS
+              value: {{ .Values.app.eventStream.attempts | quote }}
+            - name: EVENT_STREAM_RETRY_BACKOFF
+              value: {{ .Values.app.eventStream.retry_backoff | quote }}
+            - name: EVENT_STREAM_RETRY_THRESHOLD
+              value: {{ .Values.app.eventStream.retry_threshold | quote }}
             - name: EVENT_STREAM_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "reception.rabbitmq.fullname" . }}
+                  name: {{ template "coffee-shop.rabbitmq.fullname" . }}
                   key: rabbitmq-password
+            - name: EVENT_STREAM_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "coffee-shop.rabbitmq.fullname" . }}
+                  key: rabbitmq-username
             - name: EVENT_STREAM_DSN
-              value: amqp://{{ .Values.rabbitmq.username }}:$(EVENT_STREAM_PASSWORD)@{{ template "reception.rabbitmq.fullname" . }}/
-            {{- end }}
+              value: amqp://$(EVENT_STREAM_USERNAME):$(EVENT_STREAM_PASSWORD)@{{ template "coffee-shop.rabbitmq.fullname" . }}:{{ .Values.rabbitmq.rabbitmqNodePort }}/
           ports:
             - name: http
               containerPort: {{ .Values.app.port }}

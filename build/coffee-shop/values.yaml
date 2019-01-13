@@ -1,4 +1,5 @@
 replicaCount: 2
+maxReplicaCount: 5
 
 image:
   repository: italolelis/reception
@@ -17,7 +18,7 @@ ingress:
   paths:
     - "/"
   hosts:
-    - reception.local
+    - coffee-shop.local
 
 livenessProbe:
   enabled: true
@@ -59,6 +60,41 @@ app:
   metrics:
     reporting_period: "1s"
 
+barista:
+  replicaCount: 2
+  maxReplicaCount: 5
+  image:
+    repository: italolelis/barista
+    tag: latest
+    pullPolicy: IfNotPresent
+  livenessProbe:
+    enabled: true
+    endpoint: /
+    initialDelaySeconds: 120
+    timeoutSeconds: 5
+    periodSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  readinessProbe:
+    enabled: true
+    endpoint: /
+    initialDelaySeconds: 10
+    timeoutSeconds: 3
+    periodSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  log_level: "debug"
+  eventStream:
+    attempts: "5"
+    retry_backoff: "2s"
+    retry_threshold: "5"
+  metrics:
+    reporting_period: "1s"
+
 # Migration job configs
 migrations:
   github_token: ""
@@ -72,14 +108,14 @@ jaeger:
       httpPort: 14268
 
 # RabbitMQ chart configs
-rabbitmq:
-  enabled: true
-  username: user
+rabbitmq-ha:
+  rabbitmqUsername: guest
+  rabbitmqNodePort: 5672
 
 # PostgreSQL chart configs
 postgresql:
   enabled: true
   postgresqlUsername: coffee
-  postgresqlDatabase: reception
+  postgresqlDatabase: coffee-shop
   service:
     port: 5432

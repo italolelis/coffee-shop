@@ -1,12 +1,12 @@
 dependencies:
-- name: rabbitmq
+- name: rabbitmq-ha
   repository: https://kubernetes-charts.storage.googleapis.com
-  version: 4.0.5
+  version: 1.18.0
 - name: postgresql
   repository: https://kubernetes-charts.storage.googleapis.com
   version: 3.9.1
 - name: nginx-ingress
   repository: https://kubernetes-charts.storage.googleapis.com
-  version: 0.9.4
-digest: sha256:e28c2ed4a5aa48c760eb642637e56873da43bee8769217c20e8546b681eb1fcb
-generated: 2019-01-13T15:02:52.587311+01:00
+  version: 0.9.5
+digest: sha256:b629be7912c68b1eb84ba989592778a734168a60d80042f39f6d1d58f0f095e6
+generated: 2019-01-13T19:37:03.388922+01:00

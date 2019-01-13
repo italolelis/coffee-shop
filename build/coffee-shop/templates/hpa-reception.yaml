@@ -1,0 +1,25 @@
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "coffee-shop.fullname" . }}-hpa
+  labels:
+    app.kubernetes.io/name: {{ include "coffee-shop.name" . }}
+    helm.sh/chart: {{ include "coffee-shop.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  scaleTargetRef:
+    apiVersion: extensions/v1beta1
+    kind: Deployment
+    name: {{ include "coffee-shop.fullname" . }}
+  minReplicas: {{ .Values.replicaCount }}
+  maxReplicas: {{ .Values.maxReplicaCount }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageValue: 1000Mi

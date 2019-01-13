@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "barista.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "barista.name" . }}
+    helm.sh/chart: {{ include "coffee-shop.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.barista.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "barista.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "barista.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.barista.image.repository }}:{{ .Values.barista.image.tag }}"
+          imagePullPolicy: {{ .Values.barista.image.pullPolicy }}
+          env:
+            - name: LOG_LEVEL
+              value: {{ .Values.barista.log_level | quote }}
+            - name: METRICS_SERVICE_NAME
+              value: {{ include "barista.fullname" . }}
+            - name: METRICS_REPORTING_PERIOD
+              value: {{ .Values.barista.metrics.reporting_period | quote }}
+            {{- if .Values.jaeger.enabled }}
+            - name: JAEGER_SERVICE_NAME
+              value: {{ include "barista.fullname" . }}
+            - name: JAEGER_COLLECTOR_ENDPOINT
+              value: http://{{ template "coffee-shop.jaeger.collector.name" . }}:{{ .Values.jaeger.collector.service.httpPort }}/api/traces?format=jaeger.thrift
+            - name: JAEGER_PROBABILITY_FACTOR
+              value: {{ default 1 .Values.jaeger.probability_factor | quote }}
+            {{- end }}
+            - name: EVENT_STREAM_RETRY_ATTEMPTS
+              value: {{ .Values.app.eventStream.attempts | quote }}
+            - name: EVENT_STREAM_RETRY_BACKOFF
+              value: {{ .Values.app.eventStream.retry_backoff | quote }}
+            - name: EVENT_STREAM_RETRY_THRESHOLD
+              value: {{ .Values.app.eventStream.retry_threshold | quote }}
+            - name: EVENT_STREAM_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "coffee-shop.rabbitmq.fullname" . }}
+                  key: rabbitmq-password
+            - name: EVENT_STREAM_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "coffee-shop.rabbitmq.fullname" . }}
+                  key: rabbitmq-username
+            - name: EVENT_STREAM_DSN
+              value: amqp://$(EVENT_STREAM_USERNAME):$(EVENT_STREAM_PASSWORD)@{{ template "coffee-shop.rabbitmq.fullname" . }}:{{ .Values.rabbitmq.rabbitmqNodePort }}/
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          {{- if .Values.barista.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.barista.livenessProbe.endpoint }}
+              port: http
+            initialDelaySeconds: {{ .Values.barista.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.barista.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.barista.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.barista.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.barista.livenessProbe.successThreshold }}
+          {{- end }}
+          {{- if .Values.barista.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.barista.readinessProbe.endpoint }}
+              port: http
+            initialDelaySeconds: {{ .Values.barista.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.barista.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.barista.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.barista.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.barista.readinessProbe.successThreshold }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.barista.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.barista.affinity }}
+    affinity:
+      {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.barista.tolerations }}
+    tolerations:
+      {{- toYaml . | nindent 8 }}
+    {{- end }}

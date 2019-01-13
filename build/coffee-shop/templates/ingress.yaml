@@ -1,5 +1,5 @@
 {{- if .Values.ingress.enabled -}}
-  {{- $fullName := include "reception.fullname" . -}}
+  {{- $fullName := include "coffee-shop.fullname" . -}}
   {{- $ingressPaths := .Values.ingress.paths -}}
   {{- $appPort := .Values.app.port -}}
 apiVersion: extensions/v1beta1
@@ -7,8 +7,8 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    app.kubernetes.io/name: {{ include "reception.name" . }}
-    helm.sh/chart: {{ include "reception.chart" . }}
+    app.kubernetes.io/name: {{ include "coffee-shop.name" . }}
+    helm.sh/chart: {{ include "coffee-shop.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   {{- with .Values.ingress.annotations }}

@@ -28,14 +28,14 @@ spec:
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "reception.postgresql.fullname" . }}
+                  name: {{ template "coffee-shop.postgresql.fullname" . }}
                   key: postgresql-password
             - name: DATABASE_DSN
-              value: postgres://{{ .Values.postgresql.postgresqlUsername }}:$(DATABASE_PASSWORD)@{{ template "reception.postgresql.fullname" . }}/{{ .Values.postgresql.postgresqlDatabase }}?sslmode=disable
+              value: postgres://{{ .Values.postgresql.postgresqlUsername }}:$(DATABASE_PASSWORD)@{{ template "coffee-shop.postgresql.fullname" . }}/{{ .Values.postgresql.postgresqlDatabase }}?sslmode=disable
             - name: GH_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "reception.fullname" . }}
+                  name: {{ include "coffee-shop.fullname" . }}
                   key: github-token
             - name: MIGRATIONS_SOURCE_DSN
               value: github://italolelis:$(GH_TOKEN)@italolelis/coffee-shop/configs/migrations
