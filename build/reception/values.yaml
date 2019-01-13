@@ -17,7 +17,25 @@ ingress:
   paths:
     - "/"
   hosts:
-    - coffee-shop.local
+    - reception.local
+
+livenessProbe:
+  enabled: true
+  endpoint: /
+  initialDelaySeconds: 120
+  timeoutSeconds: 5
+  periodSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  endpoint: /
+  initialDelaySeconds: 10
+  timeoutSeconds: 3
+  periodSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
 
 resources: {}
 
@@ -41,17 +59,19 @@ app:
   metrics:
     reporting_period: "1s"
 
+# Migration job configs
 migrations:
   github_token: ""
 
+# Jaeger chart configs
 jaeger:
   enabled: true
-  fullname: jaeger
   probability_factor: "1"
   collector:
     service:
       httpPort: 14268
 
+# RabbitMQ chart configs
 rabbitmq:
   enabled: true
   username: user
@@ -63,21 +83,3 @@ postgresql:
   postgresqlDatabase: reception
   service:
     port: 5432
-
-livenessProbe:
-  enabled: true
-  endpoint: /
-  initialDelaySeconds: 120
-  timeoutSeconds: 5
-  periodSeconds: 5
-  failureThreshold: 6
-  successThreshold: 1
-
-readinessProbe:
-  enabled: true
-  endpoint: /
-  initialDelaySeconds: 10
-  timeoutSeconds: 3
-  periodSeconds: 5
-  failureThreshold: 3
-  successThreshold: 1

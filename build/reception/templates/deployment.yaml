@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "coffee-shop.fullname" . }}
+  name: {{ include "reception.fullname" . }}
   labels:
-    app.kubernetes.io/name: {{ include "coffee-shop.name" . }}
-    helm.sh/chart: {{ include "coffee-shop.chart" . }}
+    app.kubernetes.io/name: {{ include "reception.name" . }}
+    helm.sh/chart: {{ include "reception.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "coffee-shop.name" . }}
+      app.kubernetes.io/name: {{ include "reception.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "coffee-shop.name" . }}
+        app.kubernetes.io/name: {{ include "reception.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       containers:
@@ -43,34 +43,34 @@ spec:
             - name: EVENT_STREAM_RETRY_THRESHOLD
               value: {{ .Values.app.eventStream.retry_threshold | quote }}
             - name: METRICS_SERVICE_NAME
-              value: {{ include "coffee-shop.fullname" . }}
+              value: {{ include "reception.fullname" . }}
             - name: METRICS_REPORTING_PERIOD
               value: {{ .Values.app.metrics.reporting_period | quote }}
             {{- if .Values.jaeger.enabled }}
             - name: JAEGER_SERVICE_NAME
-              value: {{ include "coffee-shop.fullname" . }}
+              value: {{ include "reception.fullname" . }}
             - name: JAEGER_COLLECTOR_ENDPOINT
-              value: http://{{ template "coffee-shop.jaeger.fullname" . }}:{{ .Values.jaeger.collector.service.httpPort }}/api/traces?format=jaeger.thrift
+              value: http://{{ template "reception.jaeger.collector.name" . }}:{{ .Values.jaeger.collector.service.httpPort }}/api/traces?format=jaeger.thrift
             - name: JAEGER_PROBABILITY_FACTOR
-              value: {{ .Values.jaeger.probability_factor | quote }}
+              value: {{ default 1 .Values.jaeger.probability_factor | quote }}
             {{- end }}
             {{- if .Values.postgresql.enabled }}
             - name: DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "coffee-shop.postgresql.fullname" . }}
+                  name: {{ template "reception.postgresql.fullname" . }}
                   key: postgresql-password
             - name: DATABASE_DSN
-              value: postgres://{{ .Values.postgresql.postgresqlUsername }}:$(DATABASE_PASSWORD)@{{ template "coffee-shop.postgresql.fullname" . }}/{{ .Values.postgresql.postgresqlDatabase }}?sslmode=disable
+              value: postgres://{{ .Values.postgresql.postgresqlUsername }}:$(DATABASE_PASSWORD)@{{ template "reception.postgresql.fullname" . }}/{{ .Values.postgresql.postgresqlDatabase }}?sslmode=disable
             {{- end }}
             {{- if .Values.rabbitmq.enabled }}
             - name: EVENT_STREAM_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ template "coffee-shop.rabbitmq.fullname" . }}
+                  name: {{ template "reception.rabbitmq.fullname" . }}
                   key: rabbitmq-password
             - name: EVENT_STREAM_DSN
-              value: amqp://{{ .Values.rabbitmq.username }}:$(EVENT_STREAM_PASSWORD)@{{ template "coffee-shop.rabbitmq.fullname" . }}/
+              value: amqp://{{ .Values.rabbitmq.username }}:$(EVENT_STREAM_PASSWORD)@{{ template "reception.rabbitmq.fullname" . }}/
             {{- end }}
           ports:
             - name: http
