@@ -2,6 +2,8 @@ module github.com/italolelis/coffee-shop
 
 require (
 	contrib.go.opencensus.io/integrations/ocsql v0.1.2
+	github.com/InVisionApp/go-health v2.1.0+incompatible
+	github.com/InVisionApp/go-logger v1.0.1 // indirect
 	github.com/felixge/httpsnoop v1.0.0
 	github.com/go-chi/chi v3.3.4+incompatible
 	github.com/go-chi/render v1.0.1
@@ -14,7 +16,7 @@ require (
 	github.com/rafaeljesus/retry-go v0.0.0-20171214204623-5981a380a879 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/sony/gobreaker v0.0.0-20181109014844-d928aaea92e1 // indirect
-	github.com/streadway/amqp v0.0.0-20181205114330-a314942b2fd9 // indirect
+	github.com/streadway/amqp v0.0.0-20181205114330-a314942b2fd9
 	github.com/stretchr/testify v1.3.0
 	go.opencensus.io v0.18.0
 	go.uber.org/atomic v1.3.2 // indirect

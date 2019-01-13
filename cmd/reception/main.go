@@ -5,8 +5,12 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"time"
 
 	"contrib.go.opencensus.io/integrations/ocsql"
+	"github.com/InVisionApp/go-health"
+	"github.com/InVisionApp/go-health/checkers"
+	"github.com/InVisionApp/go-health/handlers"
 	"github.com/go-chi/chi"
 	"github.com/italolelis/coffee-shop/internal/app/coffees"
 	"github.com/italolelis/coffee-shop/internal/app/config"
@@ -55,13 +59,18 @@ func run(ctx context.Context) error {
 	db, dbClose := setupDatabase(ctx, cfg.Database)
 	defer dbClose()
 
-	metricsHandler := metric.Setup(ctx, cfg.Metrics)
-
 	eventStream, streamClose := stream.Setup(ctx, cfg.EventStream)
 	defer streamClose()
 
 	flush := trace.Setup(ctx, cfg.Tracing)
 	defer flush()
+
+	metricsHandler := metric.Setup(ctx, cfg.Metrics)
+
+	hc, err := setupHealthCheckers(db.DB, cfg.EventStream.DSN)
+	if err != nil {
+		return err
+	}
 
 	// coffee setup
 	cwr := postgres.NewCoffeeWriteRepository(db)
@@ -81,7 +90,7 @@ func run(ctx context.Context) error {
 		WriteTimeout:      cfg.WriteTimeout,
 		IdleTimeout:       cfg.IdleTimeout,
 		Handler: chi.ServerBaseContext(ctx, &ochttp.Handler{
-			Handler:     rest.NewServer(cs, os, metricsHandler),
+			Handler:     rest.NewServer(cs, os, metricsHandler, handlers.NewJSONHandlerFunc(hc, nil)),
 			Propagation: &b3.HTTPFormat{},
 		}),
 	}
@@ -112,4 +121,40 @@ func setupDatabase(ctx context.Context, cfg config.Database) (*sqlx.DB, func()) 
 			logger.Fatal(err)
 		}
 	}
+}
+
+func setupHealthCheckers(db *sql.DB, amqpDSN string) (*health.Health, error) {
+	// Create a new health instance
+	h := health.New()
+	h.DisableLogging()
+
+	sqlCheck, err := checkers.NewSQL(&checkers.SQLConfig{
+		Pinger: db,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if err = h.AddChecks([]*health.Config{
+		{
+			Name:     "db-reception-check",
+			Checker:  sqlCheck,
+			Interval: time.Duration(3) * time.Second,
+			Fatal:    true,
+		},
+		{
+			Name:     "amqp-reception-check",
+			Checker:  stream.NewChecker(stream.WithDSN(amqpDSN)),
+			Interval: time.Duration(3) * time.Second,
+			Fatal:    true,
+		},
+	}); err != nil {
+		return nil, err
+	}
+
+	if err := h.Start(); err != nil {
+		return nil, err
+	}
+
+	return h, nil
 }

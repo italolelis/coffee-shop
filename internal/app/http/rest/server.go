@@ -16,7 +16,7 @@ type Server struct {
 }
 
 // NewServer creates a new rest server
-func NewServer(cs coffees.Service, os order.Service, metricsHandler http.Handler) *Server {
+func NewServer(cs coffees.Service, os order.Service, metricsHandler http.Handler, healthHandler http.Handler) *Server {
 	// creates the router and register the handlers
 	r := chi.NewRouter()
 	r.Use(middleware.Timeout(60 * time.Second))
@@ -28,6 +28,7 @@ func NewServer(cs coffees.Service, os order.Service, metricsHandler http.Handler
 		w.Write([]byte("Welcome to coffee shop"))
 	})
 	r.Handle("/metrics", metricsHandler)
+	r.Handle("/status", healthHandler)
 	r.Mount("/orders", oh.router())
 	r.Mount("/coffees", ch.router())
 
