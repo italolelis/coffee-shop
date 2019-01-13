@@ -12,6 +12,7 @@ const (
 	defaultConsumeTimeout = time.Second * 3
 )
 
+// AMQPChecker is the health checker for amqp
 type AMQPChecker struct {
 	// DSN is the RabbitMQ instance connection DSN. Required.
 	DSN string
