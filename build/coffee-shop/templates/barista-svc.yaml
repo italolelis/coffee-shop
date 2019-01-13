@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "barista.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "barista.name" . }}
+    helm.sh/chart: {{ include "coffee-shop.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: {{ .Values.barista.service.type }}
+  ports:
+    - port: {{ .Values.barista.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: {{ include "barista.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
