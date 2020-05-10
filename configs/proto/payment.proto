@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = ".;pb";
+
+message PaymentRequest {
+    string OrderID = 1;
+    string Method = 2;
+}
+
+message PaymentConfirmation {
+    string ID = 1;
+    string OrderID = 2;
+}
+
+service Payment {
+    rpc Pay(PaymentRequest) returns (PaymentConfirmation) {};
+}
